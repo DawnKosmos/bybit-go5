@@ -113,3 +113,73 @@ func (c *Client) GetTickersSpot(request models.GetTickersRequest) (*models.GetTi
 	}
 	return &respBody.Result, nil
 }
+
+// GetFundingRateHistory Query historical funding rate. Each symbol has a different funding interval.
+func (c *Client) GetFundingRateHistory(request models.GetFundingRateHistoryRequest) (*models.GetFundingRateHistoryResponse, error) {
+	var respBody models.Response[models.GetFundingRateHistoryResponse]
+	err := c.GET("/v5/market/funding/history", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
+
+// GetPublicTradingHistory Query recent public trading data in Bybit.
+func (c *Client) GetPublicTradingHistory(request models.GetPublicTradingHistoryRequest) (*models.GetPublicTradingHistoryResponse, error) {
+	var respBody models.Response[models.GetPublicTradingHistoryResponse]
+	err := c.GET("/v5/market/recent-trade", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
+
+// GetOpenInterest Get open interest of each symbol.
+func (c *Client) GetOpenInterest(request models.GetOpenInterestRequest) (*models.GetOpenInterestResponse, error) {
+	var respBody models.Response[models.GetOpenInterestResponse]
+	err := c.GET("/v5/market/open-interest", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
+
+// GetHistoricalVolatility Query option historical volatility
+func (c *Client) GetHistoricalVolatility(request models.GetHistoricalVolatilityRequest) (*models.GetHistoricalVolatilityResponse, error) {
+	var respBody models.Response[models.GetHistoricalVolatilityResponse]
+	err := c.GET("/v5/market/historical-volatility", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
+
+// GetInsurance Query Bybit insurance pool data (BTC/USDT/USDC etc). The data is updated every 24 hours.
+func (c *Client) GetInsurance(request models.GetInsuranceRequest) (*models.GetInsuranceResponse, error) {
+	var respBody models.Response[models.GetInsuranceResponse]
+	err := c.GET("/v5/market/insurance", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
+
+// GetRiskLimit Query risk limit of futures
+func (c *Client) GetRiskLimit(request models.GetRiskLimitRequest) (*models.GetRiskLimitResponse, error) {
+	var respBody models.Response[models.GetRiskLimitResponse]
+	err := c.GET("/v5/market/risk-limit", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
+
+// GetOptionDeliveryPrice Get the delivery price for option
+func (c *Client) GetOptionDeliveryPrice(request models.GetOptionDeliveryPriceRequest) (*models.GetOptionDeliveryPriceResponse, error) {
+	var respBody models.Response[models.GetOptionDeliveryPriceResponse]
+	err := c.GET("/v5/market/delivery-price", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
