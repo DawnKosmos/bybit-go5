@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/DawnKosmos/bybit-go5/models"
 	"github.com/google/go-querystring/query"
 	"io"
 	"net/http"
@@ -91,8 +92,11 @@ func (c *Client) GET(path string, queryParameters any, result any) (err error) {
 	if err != nil {
 		return err
 	}
-
-	return json.Unmarshal(body, result)
+	err = json.Unmarshal(body, result)
+	if c.isDebug {
+		fmt.Println(result.(models.ReturnCode).Return())
+	}
+	return err
 }
 
 func (c *Client) POST(path string, queryJson any, result any) (err error) {
@@ -128,6 +132,9 @@ func (c *Client) POST(path string, queryJson any, result any) (err error) {
 	if err != nil {
 		return err
 	}
-
-	return json.Unmarshal(body, result)
+	err = json.Unmarshal(body, result)
+	if c.isDebug {
+		fmt.Println(result.(models.ReturnCode).Return())
+	}
+	return err
 }
