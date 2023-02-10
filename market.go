@@ -42,11 +42,7 @@ func (c *Client) GetPremiumIndexPriceKline(request models.GetKlineRequest) (*mod
 	return &respBody.Result, nil
 }
 
-type GetInstrumentsInfo interface {
-	models.GetInstrumentsInfoResponseLinear | models.GetInstrumentsInfoResponseSpot | models.GetInstrumentsInfoResponseOption
-}
-
-// GetInstrumentsInfoLinear
+// GetInstrumentsInfoLinear Query a list of instruments of online trading pair.
 func (c *Client) GetInstrumentsInfoLinear(request models.GetInstrumentsInfoRequest) (*models.GetInstrumentsInfoResponseLinear, error) {
 	var respBody models.Response[models.GetInstrumentsInfoResponseLinear]
 	err := c.GET("/v5/market/instruments-info", request, &respBody)
@@ -56,7 +52,7 @@ func (c *Client) GetInstrumentsInfoLinear(request models.GetInstrumentsInfoReque
 	return &respBody.Result, nil
 }
 
-// GetInstrumentsInfoOption
+// GetInstrumentsInfoOption Query a list of instruments of online trading pair.
 func (c *Client) GetInstrumentsInfoOption(request models.GetInstrumentsInfoRequest) (*models.GetInstrumentsInfoResponseOption, error) {
 	request.Category = "option"
 	var respBody models.Response[models.GetInstrumentsInfoResponseOption]
@@ -67,7 +63,7 @@ func (c *Client) GetInstrumentsInfoOption(request models.GetInstrumentsInfoReque
 	return &respBody.Result, nil
 }
 
-// GetInstrumentsInfoSpot
+// GetInstrumentsInfoSpot Query a list of instruments of online trading pair.
 func (c *Client) GetInstrumentsInfoSpot(request models.GetInstrumentsInfoRequest) (*models.GetInstrumentsInfoResponseSpot, error) {
 	request.Category = "spot"
 	var respBody models.Response[models.GetInstrumentsInfoResponseSpot]
@@ -78,7 +74,7 @@ func (c *Client) GetInstrumentsInfoSpot(request models.GetInstrumentsInfoRequest
 	return &respBody.Result, nil
 }
 
-// GetOrderbook
+// GetOrderbook Query orderbook data
 func (c *Client) GetOrderbook(request models.GetOrderbookRequest) (*models.GetOrderbookResponse, error) {
 	var respBody models.Response[models.GetOrderbookResponse]
 	err := c.GET("/v5/market/orderbook", request, &respBody)
@@ -88,7 +84,7 @@ func (c *Client) GetOrderbook(request models.GetOrderbookRequest) (*models.GetOr
 	return &respBody.Result, nil
 }
 
-// GetTickersLinear
+// GetTickersLinear Query the latest price snapshot, best bid/ask price, and trading volume in the last 24 hours.
 func (c *Client) GetTickersLinear(request models.GetTickersRequest) (*models.GetTickersLinearResponse, error) {
 	var respBody models.Response[models.GetTickersLinearResponse]
 	err := c.GET("/v5/market/tickers", request, &respBody)
@@ -98,7 +94,7 @@ func (c *Client) GetTickersLinear(request models.GetTickersRequest) (*models.Get
 	return &respBody.Result, nil
 }
 
-// GetTickersOption
+// GetTickersOption Query the latest price snapshot, best bid/ask price, and trading volume in the last 24 hours.
 func (c *Client) GetTickersOption(request models.GetTickersRequest) (*models.GetTickersOptionResponse, error) {
 	var respBody models.Response[models.GetTickersOptionResponse]
 	err := c.GET("/v5/market/tickers", request, &respBody)
@@ -108,6 +104,7 @@ func (c *Client) GetTickersOption(request models.GetTickersRequest) (*models.Get
 	return &respBody.Result, nil
 }
 
+// GetTickersSpot Query the latest price snapshot, best bid/ask price, and trading volume in the last 24 hours.
 func (c *Client) GetTickersSpot(request models.GetTickersRequest) (*models.GetTickersSpotResponse, error) {
 	var respBody models.Response[models.GetTickersSpotResponse]
 	err := c.GET("/v5/market/tickers", request, &respBody)
