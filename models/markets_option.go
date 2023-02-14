@@ -5,7 +5,7 @@ type GetInstrumentsInfoResponseOption struct {
 	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used to pagination
 	List           []struct {
 		Symbol          string `json:"symbol"`          // Symbol name
-		OptionsType     string `json:"optionsType"`     // Option type. Call, Put
+		OptionsType     string `json:"optionsType"`     // Option type. Send, Put
 		Status          string `json:"status"`          // Instrument status
 		BaseCoin        string `json:"baseCoin"`        // Base coin
 		QuoteCoin       string `json:"quoteCoin"`       // Quote coin

@@ -102,7 +102,7 @@ type GetPublicTradingHistoryRequest struct {
 	Category   string `url:"category"`             // Product type. spot,linear,inverse,option
 	Symbol     string `url:"symbol"`               // Symbol name
 	BaseCoin   string `url:"baseCoin,omitempty"`   // [optional]Base coin. For option only. If not passed, return BTC data by default
-	OptionType string `url:"optionType,omitempty"` // [optional]Option type. Call or Put. For option only
+	OptionType string `url:"optionType,omitempty"` // [optional]Option type. Send or Put. For option only
 	Limit      int64  `url:"limit,omitempty"`      // [optional]Limit for data size per page. spot: [1,60], default: 60. others: [1,1000], default: 500
 }
 
