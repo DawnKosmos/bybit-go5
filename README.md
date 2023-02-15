@@ -2,11 +2,15 @@
 
 # WIP
 
-Implementation of the Bybit API v5 in golang
-
-Version 5 unifies Spot/USDC/USDT/Inverse
+This Golang library implements the Bybit API v5
 
 [Docs](https://bybit-exchange.github.io/docs/v5/intro)
+
+REST and websocket api are implemented. I generated most structs from the documentation,
+which has some type error, so some API Calls produce error! 
+If you notice one Write. Please write an issue and I fix it.
+
+===
 
 Names of Structs and Functions and their comments are generated from the above Documentation.
 
@@ -14,15 +18,11 @@ Due to limitations in the GoLang Type Systems some endpoints have 3 Functions.
 
 1 For each possible Response struct from the Api.
 
-E.g. GetInstrumentsInfo depending on the **Category** linear/inverse, spot or options
-
-You get another response struct
+E.g. GetInstrumentsInfo depending on the **Category** linear/inverse, spot or options gives different response struct
 
 
 
-This Golang library implements the Bybit API v5
 
-[Docs](https://bybit-exchange.github.io/docs/v5/intro)
 
 ### Example
 ```go
@@ -76,7 +76,7 @@ func WSExample() error {
 	})
 
 	err := client.Kline("BTCUSDT", "1", func(e *models.WsKline) {
-		// You can Setup What to do when the Event of tickers.BTCUSDT happens, e.g. Save in a DB
+		// This Function gets triggered every time this Kline Event is received by the WS
 		fmt.Println(e.Data)
 	})
 
