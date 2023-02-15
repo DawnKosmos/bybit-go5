@@ -37,7 +37,7 @@ type Stream struct {
 
 	conn *websocket.Conn // Websocket connection
 
-	subscriptions []string // TODO
+	subscriptions []string // Overview of Subscriptions
 
 	//sm = SyncMap. This map saves the function we set when we subscribe to Endpoints e.g. ws.Position(e func(e *models.Position)){}
 	sm *sync.Map
@@ -151,10 +151,13 @@ func (s *Stream) Send(request any) (err error) {
 
 // Filter Message Type
 type Event struct {
-	ReqId string `json:"req_id,omitempty"`
-	Topic string `json:"topic,omitempty"`
+	Op      string `json:"op,omitempty"`
+	Success bool   `json:"success,omitempty"`
+	ReqId   string `json:"req_id,omitempty"`
+	Topic   string `json:"topic,omitempty"`
 }
 
+// TODO add unsubscribe and take care Event Responses
 func (s *Stream) Read() {
 	for {
 		_, data, err := s.conn.Read(s.ctx)
@@ -180,9 +183,16 @@ func (s *Stream) Read() {
 		}
 		if s.debugMode {
 			if len(e.Topic) == 0 { // Check if Topic is Empty
-				log.Println(string(data))
-				//
-
+				if e.Success {
+					if e.Op == "subscribe" {
+						log.Printf("Subscription to %s", e.ReqId)
+					}
+					if e.Op == "unsubscribe" {
+						log.Printf("Unsubscription to %s", e.ReqId)
+					}
+				} else {
+					log.Println(string(data))
+				}
 				continue
 			}
 		}
@@ -198,8 +208,7 @@ func (s *Stream) Read() {
 }
 
 /*
-StoreFunc saves a string and a function
-
+StoreFunc saves the Topic String with a generated  function that gets a []byte and converts it into the Generics type T
 The Map is of type map[string]func([]byte)
 */
 func StoreFunc[T any](sm *sync.Map, debug bool, key string, fn func(*T)) {

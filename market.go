@@ -2,7 +2,7 @@ package bybit
 
 import "github.com/DawnKosmos/bybit-go5/models"
 
-// GetKline Query the kline data. Charts are returned in groups based on the requested interval. // Limit is 200
+// GetKline Query the kline data. Charts are returned in groups based on the requested interval. Limit is 200
 func (c *Client) GetKline(request models.GetKlineRequest) (*models.GetKlineResponse, error) {
 	var respBody models.Response[models.GetKlineResponse]
 	err := c.GET("/v5/market/kline", request, &respBody)

@@ -25,8 +25,9 @@ Level 100 data, push frequency: 100ms
 func (s *Stream) Orderbook(ticker string, depth int, fn func(e *models.WsOrderbook)) error {
 	topic := fmt.Sprintf("orderbook.%d.%s", depth, ticker)
 	err := s.Send(models.WsPublicRequest{
-		Op:   "subscribe",
-		Args: []string{topic},
+		ReqId: topic,
+		Op:    "subscribe",
+		Args:  []string{topic},
 	})
 	if err != nil {
 		return err
@@ -38,7 +39,7 @@ func (s *Stream) Orderbook(ticker string, depth int, fn func(e *models.WsOrderbo
 
 func (s *Stream) PublicTrade(ticker string, fn func(e *models.WsTrade)) error {
 	topic := fmt.Sprintf("publicTrade.%s", ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -49,7 +50,7 @@ func (s *Stream) PublicTrade(ticker string, fn func(e *models.WsTrade)) error {
 
 func (s *Stream) TickerOption(ticker string, fn func(e *models.WsTickerOption)) error {
 	topic := fmt.Sprintf("tickers.%s", ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -60,7 +61,7 @@ func (s *Stream) TickerOption(ticker string, fn func(e *models.WsTickerOption)) 
 
 func (s *Stream) TickerLinear(ticker string, fn func(e *models.WsTickerLinear)) error {
 	topic := fmt.Sprintf("tickers.%s", ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -71,7 +72,7 @@ func (s *Stream) TickerLinear(ticker string, fn func(e *models.WsTickerLinear)) 
 
 func (s *Stream) TickerSpot(ticker string, fn func(e *models.WsTickerSpot)) error {
 	topic := fmt.Sprintf("tickers.%s", ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -94,7 +95,7 @@ kline.{interval}.{symbol} e.g., kline.30.BTCUSDT
 */
 func (s *Stream) Kline(ticker string, interval string, fn func(e *models.WsKline)) error {
 	topic := fmt.Sprintf("kline.%s.%s", interval, ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -106,7 +107,7 @@ func (s *Stream) Kline(ticker string, interval string, fn func(e *models.WsKline
 // Liquidation Push frequency: real-time
 func (s *Stream) Liquidation(ticker string, fn func(e *models.WsLiquidation)) error {
 	topic := fmt.Sprintf("liquidation.%s", ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -131,7 +132,7 @@ kline_lt.{interval}.{symbol} e.g., kline_lt.30.BTC3SUSDT
 */
 func (s *Stream) LeveragedTokenKline(ticker string, interval string, fn func(e *models.WsLTKline)) error {
 	topic := fmt.Sprintf("kline_lt.%s.%s", interval, ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -142,7 +143,7 @@ func (s *Stream) LeveragedTokenKline(ticker string, interval string, fn func(e *
 
 func (s *Stream) LeveragedTokenTicker(ticker string, fn func(e *models.WsLTTicker)) error {
 	topic := fmt.Sprintf("lt.%s", ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}
@@ -153,7 +154,7 @@ func (s *Stream) LeveragedTokenTicker(ticker string, fn func(e *models.WsLTTicke
 
 func (s *Stream) LeveragedTokenNav(ticker string, fn func(e *models.WsLTNav)) error {
 	topic := fmt.Sprintf("kline_lt.%s", ticker)
-	err := s.Send(models.WsPublicRequest{Op: "subscribe", Args: []string{topic}})
+	err := s.Send(models.WsPublicRequest{ReqId: topic, Op: "subscribe", Args: []string{topic}})
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/DawnKosmos/bybit-go5/models"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -56,4 +57,8 @@ func (s *Stream) reconnect() {
 	time.Sleep(1 * time.Second)
 
 	s.start()
+}
+
+func (s *Stream) ReturnSynvMap() *sync.Map {
+	return s.sm
 }

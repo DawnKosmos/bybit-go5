@@ -20,7 +20,7 @@ func TestPing(t *testing.T) {
 		TestNet:       false,
 	})
 
-	err := ws.Orderbook("BTCUSDT", 1, func(e *models.WsOrderbook) {
+	err := ws.Orderbook("BTCUdSDT", 1, func(e *models.WsOrderbook) {
 		fmt.Println(e.Ts, e.Data)
 	})
 	if err != nil {
@@ -28,7 +28,7 @@ func TestPing(t *testing.T) {
 		t.FailNow()
 	}
 
-	err = ws.PublicTrade("BTCUSDT", func(e *models.WsTrade) {
+	err = ws.PublicTrade("BTCsUSDT", func(e *models.WsTrade) {
 		fmt.Println(e.Ts, e.Data)
 	})
 

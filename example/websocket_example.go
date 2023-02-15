@@ -15,11 +15,9 @@ func WSExample() error {
 		Debug:         true,
 	})
 
-	var counter int
-	err := client.TickerLinear("BTCUSDT", func(e *models.WsTickerLinear) {
+	err := client.Kline("BTCUSDT", "1", func(e *models.WsKline) {
 		// You can Setup What to do when the Event of tickers.BTCUSDT happens, e.g. Save in a DB
-		counter++
-		fmt.Println(counter)
+		fmt.Println(e.Data)
 	})
 
 	if err != nil {
