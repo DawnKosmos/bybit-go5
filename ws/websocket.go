@@ -55,3 +55,19 @@ func GetWsLink(id WsLink, testnet bool) string {
 	}
 	return s
 }
+
+func Enum(endpoint string) WsLink {
+	switch endpoint {
+	case "spot":
+		return SPOT
+	case "linear":
+		return LINEAR
+	case "inverse":
+		return INVERSE
+	case "option":
+		return OPTION
+	case "private":
+		return PRIVATE
+	}
+	return LINEAR
+}

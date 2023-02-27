@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	a := &bybit.Account{
 		PublicKey: "",
 		SecretKey: "",
@@ -25,4 +26,7 @@ func main() {
 		fmt.Println(v)
 	}
 
+	if err := WSExample(); err != nil {
+		fmt.Println(err)
+	}
 }

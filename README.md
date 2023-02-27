@@ -8,7 +8,7 @@ This Golang library implements the Bybit API v5
 
 REST and websocket api are implemented. I generated most structs from the documentation,
 which has some type error, so some API Calls produce error! 
-If you notice one Write. Please write an issue and I fix it.
+If you notice one write an issue, and I fix it.
 
 ===
 
@@ -19,8 +19,6 @@ Due to limitations in the GoLang Type Systems some endpoints have 3 Functions.
 1 For each possible Response struct from the Api.
 
 E.g. GetInstrumentsInfo depending on the **Category** linear/inverse, spot or options gives different response struct
-
-
 
 
 
@@ -76,7 +74,7 @@ func WSExample() error {
 	})
 
 	err := client.Kline("BTCUSDT", "1", func(e *models.WsKline) {
-		// This Function gets triggered every time this Kline Event is received by the WS
+		// This Function gets triggered every time this Kline Event is received by the WS 
 		fmt.Println(e.Data)
 	})
 

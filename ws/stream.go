@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DawnKosmos/bybit-go5"
-	"io"
 	"log"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
@@ -15,10 +14,9 @@ import (
 )
 
 /*
-	Stream is only 1 websocket connection
-
+Stream is only 1 websocket connection
 It only serves 1 of the 5 Endpoints.
-In the Config file you can choose which Endpoints you want to visit.
+In the Config struct you can choose which Endpoints you want to visit.
 */
 type Stream struct {
 	started       time.Time       // just for log purpose
@@ -37,7 +35,7 @@ type Stream struct {
 
 	conn *websocket.Conn // Websocket connection
 
-	subscriptions []string // Overview of Subscriptions
+	subscriptions map[string]struct{} // Overview of Subscriptions
 
 	//sm = SyncMap. This map saves the function we set when we subscribe to Endpoints e.g. ws.Position(e func(e *models.Position)){}
 	sm *sync.Map
@@ -66,9 +64,8 @@ func New(cfg Config) *Stream {
 		autoReconnect: cfg.AutoReconnect,
 		debugMode:     cfg.Debug,
 		a:             cfg.A,
-		heartCancel:   nil,
 		isConnected:   false,
-		subscriptions: nil,
+		subscriptions: make(map[string]struct{}),
 		sm:            &sync.Map{},
 		expires:       cfg.Expire * 1000,
 	}
@@ -110,7 +107,7 @@ func (s *Stream) start() error {
 	if s.a != nil {
 		err := s.Authentication()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 
@@ -159,20 +156,20 @@ type Event struct {
 
 // TODO add unsubscribe and take care Event Responses
 func (s *Stream) Read() {
+	ctx, cancel := context.WithTimeout(s.ctx, 30*time.Second)
+	defer cancel()
+
 	for {
-		_, data, err := s.conn.Read(s.ctx)
-		// if connections disconnects it gets registered here
-		if e, ok := err.(*websocket.CloseError); ok {
-			if e.Code == websocket.StatusNormalClosure && e.Error() == io.ErrUnexpectedEOF.Error() {
-				err = io.ErrUnexpectedEOF
-				if s.debugMode {
-					log.Println(err)
-				}
-				if s.autoReconnect {
-					close(s.disconnect) // reconnect attempts here after 1 seconds
-				}
-				break
+		_, data, err := s.conn.Read(ctx)
+
+		if err != nil {
+			if s.debugMode {
+				log.Println(err)
 			}
+			if s.autoReconnect {
+				close(s.disconnect) // reconnect attempts here after 1 seconds
+			}
+			break
 		}
 
 		var e Event
@@ -181,20 +178,14 @@ func (s *Stream) Read() {
 			fmt.Println(err)
 			continue
 		}
-		if s.debugMode {
-			if len(e.Topic) == 0 { // Check if Topic is Empty
-				if e.Success {
-					if e.Op == "subscribe" {
-						log.Printf("Subscription to %s", e.ReqId)
-					}
-					if e.Op == "unsubscribe" {
-						log.Printf("Unsubscription to %s", e.ReqId)
-					}
-				} else {
-					log.Println(string(data))
-				}
-				continue
+
+		if len(e.Topic) == 0 { // Check if Topic is Empty
+			if e.Success {
+				s.manageSubscription(e.Op, e.ReqId)
+			} else {
+				log.Println(string(data))
 			}
+			continue
 		}
 
 		fn, ok := s.sm.Load(e.Topic) //Load the function
@@ -206,6 +197,8 @@ func (s *Stream) Read() {
 		}
 	}
 }
+
+var void struct{}
 
 /*
 StoreFunc saves the Topic String with a generated  function that gets a []byte and converts it into the Generics type T
@@ -221,4 +214,11 @@ func StoreFunc[T any](sm *sync.Map, debug bool, key string, fn func(*T)) {
 			}
 			fn(&e) // Execute the provided function
 		})
+}
+
+func (s *Stream) GetSubscriptions() (o []string) {
+	for v, _ := range s.subscriptions {
+		o = append(o, v)
+	}
+	return o
 }

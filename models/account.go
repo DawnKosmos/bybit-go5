@@ -147,4 +147,14 @@ type SetMarginModeResponse struct {
 	} `json:"reasons"` // Object. If requested successfully, it is an empty array
 }
 
-//TODO write unit test
+type GetFeeRateDerivativesRequest struct {
+	Symbol string `url:"symbol,omitempty"` // [optional]Symbol name
+}
+
+type GetFeeRateDerivativesResponse struct {
+	List []struct {
+		Symbol       string `json:"symbol"`       // Symbol name
+		TakerFeeRate string `json:"takerFeeRate"` // Taker fee rate
+		MakerFeeRate string `json:"makerFeeRate"` // Maker fee rate
+	} `json:"list"` // Object
+}

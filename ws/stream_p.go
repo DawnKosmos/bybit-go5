@@ -24,6 +24,7 @@ func (s *Stream) heartBeat() {
 			return
 		}
 	}
+
 }
 
 func (s *Stream) Ping() error {
@@ -59,6 +60,21 @@ func (s *Stream) reconnect() {
 	s.start()
 }
 
-func (s *Stream) ReturnSynvMap() *sync.Map {
+func (s *Stream) ReturnSyncMap() *sync.Map {
 	return s.sm
+}
+
+func (s *Stream) manageSubscription(op string, reqId string) {
+	if s.debugMode {
+		log.Println(op, reqId)
+	}
+
+	switch op {
+	case "subscribe":
+		s.subscriptions[reqId] = void
+	case "unsubscribe":
+		delete(s.subscriptions, reqId)
+	default:
+		log.Println(op, reqId)
+	}
 }

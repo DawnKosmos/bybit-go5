@@ -81,3 +81,13 @@ func (c *Client) SetMarginMode(request models.SetMarginModeRequest) (*models.Set
 	}
 	return &respBody.Result, nil
 }
+
+// GetFeeRateDerivatives Get the trading fee rate of derivatives.
+func (c *Client) GetFeeRateDerivatives(request models.GetFeeRateDerivativesRequest) (*models.GetFeeRateDerivativesResponse, error) {
+	var respBody models.Response[models.GetFeeRateDerivativesResponse]
+	err := c.GET("/v5/account/fee-rate", request, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody.Result, nil
+}
