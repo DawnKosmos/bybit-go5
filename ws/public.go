@@ -166,7 +166,8 @@ func (s *Stream) LeveragedTokenNav(ticker string, fn func(e *models.WsLTNav)) er
 func (s *Stream) resubscribe() error {
 	subs := s.GetSubscriptions()
 	return s.Send(models.WsPublicRequest{
-		Op:   "subscribe",
-		Args: subs,
+		ReqId: "resubscribe",
+		Op:    "subscribe",
+		Args:  subs,
 	})
 }

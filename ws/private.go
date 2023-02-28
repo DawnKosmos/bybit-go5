@@ -28,8 +28,9 @@ func (s *Stream) Authentication() error {
 func (s *Stream) Position(fn func(e *models.WsPosition)) error {
 	topic := "position"
 	err := s.Send(models.WsPublicRequest{
-		Op:   "subscribe",
-		Args: []string{topic},
+		ReqId: topic,
+		Op:    "subscribe",
+		Args:  []string{topic},
 	})
 
 	StoreFunc(s.sm, s.debugMode, topic, fn)
@@ -39,8 +40,9 @@ func (s *Stream) Position(fn func(e *models.WsPosition)) error {
 func (s *Stream) Execution(fn func(e *models.WsExecution)) error {
 	topic := "execution"
 	err := s.Send(models.WsPublicRequest{
-		Op:   "subscribe",
-		Args: []string{topic},
+		ReqId: topic,
+		Op:    "subscribe",
+		Args:  []string{topic},
 	})
 
 	StoreFunc(s.sm, s.debugMode, topic, fn)
@@ -50,8 +52,9 @@ func (s *Stream) Execution(fn func(e *models.WsExecution)) error {
 func (s *Stream) Order(fn func(e *models.WsOrder)) error {
 	topic := "order"
 	err := s.Send(models.WsPublicRequest{
-		Op:   "subscribe",
-		Args: []string{topic},
+		ReqId: topic,
+		Op:    "subscribe",
+		Args:  []string{topic},
 	})
 
 	StoreFunc(s.sm, s.debugMode, topic, fn)
@@ -61,8 +64,9 @@ func (s *Stream) Order(fn func(e *models.WsOrder)) error {
 func (s *Stream) Wallet(fn func(e *models.WsWallet)) error {
 	topic := "wallet"
 	err := s.Send(models.WsPublicRequest{
-		Op:   "subscribe",
-		Args: []string{topic},
+		ReqId: topic,
+		Op:    "subscribe",
+		Args:  []string{topic},
 	})
 
 	StoreFunc(s.sm, s.debugMode, topic, fn)
@@ -72,8 +76,9 @@ func (s *Stream) Wallet(fn func(e *models.WsWallet)) error {
 func (s *Stream) Greek(fn func(e *models.WsGreek)) error {
 	topic := "greeks"
 	err := s.Send(models.WsPublicRequest{
-		Op:   "subscribe",
-		Args: []string{topic},
+		ReqId: topic,
+		Op:    "subscribe",
+		Args:  []string{topic},
 	})
 
 	StoreFunc(s.sm, s.debugMode, topic, fn)
