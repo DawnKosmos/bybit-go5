@@ -96,6 +96,14 @@ func (c *Client) GET(path string, queryParameters any, result any) (err error) {
 	if c.isDebug {
 		fmt.Println(result.(models.ReturnCode).Return())
 	}
+	res, ok := result.(models.ReturnCode)
+	if ok {
+		code, str := res.Return()
+		if code != 0 {
+			err = errors.New(str)
+		}
+	}
+
 	return err
 }
 
@@ -136,5 +144,14 @@ func (c *Client) POST(path string, queryJson any, result any) (err error) {
 	if c.isDebug {
 		fmt.Println(result.(models.ReturnCode).Return())
 	}
+
+	res, ok := result.(models.ReturnCode)
+	if ok {
+		code, str := res.Return()
+		if code != 0 {
+			err = errors.New(str)
+		}
+	}
+
 	return err
 }
