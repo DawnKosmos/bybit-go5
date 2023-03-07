@@ -62,8 +62,9 @@ func (c *Client) GetOrderHistory(request models.GetOrderHistoryRequest) (*models
 	return &respBody.Result, nil
 }
 
+// BatchPlaceOrder only supports Options!!
 func (c *Client) BatchPlaceOrder(request models.BatchPlaceOrderRequest) (*models.BatchPlaceOrderResponse, error) {
-	var respBody models.Response[models.BatchPlaceOrderResponse]
+	var respBody models.ResponseBatch[models.BatchPlaceOrderResponse]
 	err := c.POST("/v5/order/create-batch", request, &respBody)
 	if err != nil {
 		return nil, err
@@ -71,8 +72,9 @@ func (c *Client) BatchPlaceOrder(request models.BatchPlaceOrderRequest) (*models
 	return &respBody.Result, nil
 }
 
+// BatchAmendOrder only supports Options!!
 func (c *Client) BatchAmendOrder(request models.BatchAmendOrderRequest) (*models.BatchAmendOrderResponse, error) {
-	var respBody models.Response[models.BatchAmendOrderResponse]
+	var respBody models.ResponseBatch[models.BatchAmendOrderResponse]
 	err := c.POST("/v5/order/amend-batch", request, &respBody)
 	if err != nil {
 		return nil, err

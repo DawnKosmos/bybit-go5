@@ -124,8 +124,13 @@ func (c *Client) POST(path string, queryJson any, result any) (err error) {
 	if err != nil {
 		return err
 	}
+
 	if c.a != nil { // Sign Request
 		SignPOST(c.a, req, jsonBody)
+	}
+
+	if c.isDebug {
+		fmt.Println("Post Request", req.URL.String())
 	}
 
 	//Do Request
@@ -133,13 +138,18 @@ func (c *Client) POST(path string, queryJson any, result any) (err error) {
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close()
+	if resp.StatusCode >= 400 && resp.StatusCode < 405 {
+		return errors.New(fmt.Sprintf("Error Code received: %d", resp.StatusCode))
+	}
 
 	//Read Json Body and Unmarshal
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
+
 	err = json.Unmarshal(body, result)
 	if c.isDebug {
 		fmt.Println(result.(models.ReturnCode).Return())

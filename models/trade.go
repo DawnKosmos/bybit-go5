@@ -182,43 +182,38 @@ type GetOrderHistoryResponse struct {
 		CloseOnTrigger     bool   `json:"closeOnTrigger"`     // Close on trigger. What is a close on trigger order?
 		CreatedTime        string `json:"createdTime"`        // Order created timestamp (ms)
 		UpdatedTime        string `json:"updatedTime"`        // Order updated timestamp (ms)
-	} `json:"list"` // Object
+	} `json:"list"`                               // Object
 	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used for pagination
 }
 
 type BatchPlaceOrderRequest struct {
-	Category string `json:"category"` // Product type. option
-	Request  []struct {
-		Symbol      string `json:"symbol"`                // Symbol name
-		Side        string `json:"side"`                  // Buy, Sell
-		OrderType   string `json:"orderType"`             // Market, Limit
-		Qty         string `json:"qty"`                   // Order quantity
-		Price       string `json:"price,omitempty"`       // [optional]Order price. Invalid if orderType=Market
-		OrderIv     string `json:"orderIv,omitempty"`     // [optional]Implied volatility. option only. orderIv has a higher priority than price. Pass the real value, e.g for 10%, 0.1 should be passed
-		TimeInForce string `json:"timeInForce,omitempty"` // [optional]Time in force Market order will use IOC directly If not passed, GTC is used by default
-		OrderLinkId string `json:"orderLinkId"`           // User customised order ID. A max of 36 characters. Combinations of numbers, letters (upper and lower cases), dashes, and underscores are supported. rule of option: required param always unique
-		ReduceOnly  bool   `json:"reduceOnly,omitempty"`  // [optional]What is a reduce-only order? true means your position can only reduce in size if this order is triggered.
-		Mmp         bool   `json:"mmp,omitempty"`         // [optional]Market maker protection. option only. true means set the order as a market maker protection order
+	Category string                 `json:"category"` // Product type. option
+	Request  []BatchPlaceOrderInput `json:"request"`  // Object
+}
 
-	} `json:"request"` // Object
+type BatchPlaceOrderInput struct {
+	Category    string `json:"category"`              // Product type. option
+	Symbol      string `json:"symbol"`                // Symbol name
+	Side        string `json:"side"`                  // Buy, Sell
+	OrderType   string `json:"orderType"`             // Market, Limit
+	Qty         string `json:"qty"`                   // Order quantity
+	Price       string `json:"price,omitempty"`       // [optional]Order price. Invalid if orderType=Market
+	OrderIv     string `json:"orderIv,omitempty"`     // [optional]Implied volatility. option only. orderIv has a higher priority than price. Pass the real value, e.g for 10%, 0.1 should be passed
+	TimeInForce string `json:"timeInForce,omitempty"` // [optional]Time in force Market order will use IOC directly If not passed, GTC is used by default
+	OrderLinkId string `json:"orderLinkId"`           // User customised order ID. A max of 36 characters. Combinations of numbers, letters (upper and lower cases), dashes, and underscores are supported. rule of option: required param always unique
+	ReduceOnly  bool   `json:"reduceOnly,omitempty"`  // [optional]What is a reduce-only order? true means your position can only reduce in size if this order is triggered.
+	Mmp         bool   `json:"mmp,omitempty"`         // [optional]Market maker protection. option only. true means set the order as a market maker protection order
+
 }
 
 type BatchPlaceOrderResponse struct {
-	Result struct {
-		List []struct {
-			Category    string `json:"category"`    // Product type
-			Symbol      string `json:"symbol"`      // Symbol name
-			OrderId     string `json:"orderId"`     // Order ID
-			OrderLinkId string `json:"orderLinkId"` // User customised order ID
-			CreateAt    string `json:"createAt"`    // Order created time (ms)
-		} `json:"list"` // Object
-	} `json:"result"` // Object
-	RetExtInfo struct {
-		List []struct {
-			Code int64  `json:"code"` // Success/error code
-			Msg  string `json:"msg"`  // Success/error message
-		} `json:"list"` // Object
-	} `json:"retExtInfo"` // retExtInfo
+	List []struct {
+		Category    string `json:"category"`    // Product type
+		Symbol      string `json:"symbol"`      // Symbol name
+		OrderId     string `json:"orderId"`     // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+		CreateAt    string `json:"createAt"`    // Order created time (ms)
+	} `json:"list"` // Object
 }
 
 type BatchAmendOrderRequest struct {
@@ -234,20 +229,13 @@ type BatchAmendOrderRequest struct {
 }
 
 type BatchAmendOrderResponse struct {
-	Result struct {
-		List []struct {
-			Category    string `json:"category"`    // Product type
-			Symbol      string `json:"symbol"`      // Symbol name
-			OrderId     string `json:"orderId"`     // Order ID
-			OrderLinkId string `json:"orderLinkId"` // User customised order ID
-		} `json:"list"` // Object
-	} `json:"result"` // Object
-	RetExtInfo struct {
-		List []struct {
-			Code int64  `json:"code"` // Success/error code
-			Msg  string `json:"msg"`  // Success/error message
-		} `json:"list"` // Object
-	} `json:"retExtInfo"` //  Object
+	List []struct {
+		Category    string `json:"category"`    // Product type
+		Symbol      string `json:"symbol"`      // Symbol name
+		OrderId     string `json:"orderId"`     // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+	} `json:"list"` // Object
+
 }
 
 type BatchCancelOrderRequest struct {
