@@ -9,9 +9,9 @@ type GetKlineRequest struct {
 	Category string `url:"category"`
 	Symbol   string `url:"symbol"`
 	Interval string `url:"interval"`
-	Start    int64  `url:",omitempty"` // [optional] The start timestamp (ms)
-	End      int64  `url:",omitempty"` // [optional] The end timestamp (ms)
-	Limit    int    `url:",omitempty"` // [optional] Default is 200
+	Start    int64  `url:"start,omitempty"` // [optional] The start timestamp (ms)
+	End      int64  `url:"end,omitempty"`   // [optional] The end timestamp (ms)
+	Limit    int    `url:"limit,omitempty"` // [optional] Default is 200
 }
 
 type GetKlineResponse struct {
