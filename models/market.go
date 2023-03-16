@@ -130,16 +130,13 @@ type GetOpenInterestRequest struct {
 }
 
 type GetOpenInterestResponse struct {
-	Category string `json:"category"` // Products category
+	Symbol   string `json:"symbol"`
+	Category string `json:"category"`
 	List     []struct {
-		ExecId       string `json:"execId"`       // Execution ID
-		Symbol       string `json:"symbol"`       // Symbol name
-		Price        string `json:"price"`        // Trade price
-		Size         string `json:"size"`         // Trade size
-		Side         string `json:"side"`         // Buy, Sell
-		Time         string `json:"time"`         // Trade time (ms)
-		IsBlockTrade bool   `json:"isBlockTrade"` // Whether the trade is block trade
-	} `json:"list"` // Object
+		OpenInterest string `json:"openInterest"`
+		Timestamp    string `json:"timestamp"`
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"`
 }
 
 type GetHistoricalVolatilityRequest struct {
