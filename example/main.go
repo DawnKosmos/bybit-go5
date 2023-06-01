@@ -19,6 +19,7 @@ func main() {
 		PublicKey: bb[0],
 		SecretKey: bb[1],
 	}
+
 	c, _ := bybit.New(nil, bybit.TESTURL, a, true)
 	resp, err := c.GetKline(models.GetKlineRequest{
 		Category: "linear",

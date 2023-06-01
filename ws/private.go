@@ -11,7 +11,6 @@ import (
 
 // Authentification copied from github.com/frankrap/bybit-api/
 func (s *Stream) Authentication() error {
-
 	expires := time.Now().UnixMilli() + s.expires
 	req := fmt.Sprintf("GET/realtime%d", expires)
 	sig := hmac.New(sha256.New, []byte(s.a.SecretKey))
