@@ -12,10 +12,10 @@ func WSExample() error {
 		Ctx:           nil,
 		Endpoint:      ws.LINEAR, // Use linear datapoint
 		AutoReconnect: true,
-		Debug:         true,
+		Debug:         false,
 	})
 
-	err := client.Kline("BTCUSDT", "1", func(e *models.WsKline) {
+	err := client.PublicTrade("BTCUSDT", func(e *models.WsTrade) {
 		// You can Setup What to do when the Event of tickers.BTCUSDT happens, e.g. Save in a DB
 		fmt.Println(e.Data)
 	})

@@ -15,14 +15,14 @@ import (
 
 /*
 Stream is only 1 websocket connection
-It only serves 1 of the 5 Endpoints.
+It only can serve 1 of the 5 Endpoints at once.
 In the Config struct you can choose which Endpoints you want to visit.
 */
 type Stream struct {
 	started       time.Time       // just for log purpose
 	ctx           context.Context // context
 	Link          string          // config.Endpoint and config.Testnet get you the ws Link
-	autoReconnect bool            // AutoReconnect when Disconnect. Be aware that this needs to be hotfixed
+	autoReconnect bool            // AutoReconnect when Disconnect.
 	debugMode     bool            // debug Mode atm only logs stuff
 	a             *bybit.Account  //field is only needed for Private Endpoint
 
@@ -38,6 +38,7 @@ type Stream struct {
 	subscriptions map[string]struct{} // Overview of Subscriptions
 
 	//sm = SyncMap. This map saves the function we set when we subscribe to Endpoints e.g. ws.Position(e func(e *models.Position)){}
+	// it data type is map[string]func([]byte)
 	sm *sync.Map
 }
 
@@ -45,7 +46,7 @@ type Config struct {
 	Id            string          // [optional] Just an Id for yourself
 	Ctx           context.Context // [optional]
 	Expire        int64           // in Seconds. The Time after a private Channel expires.
-	Endpoint      WsLink          // Set which Endpoint you want to subscribe LINEAR | INVERSE | OPTION | PRIVATE
+	Endpoint      WsLink          // Set which Endpoint you want to subscribe SPOT | LINEAR | INVERSE | OPTION | PRIVATE
 	A             *bybit.Account  //  [optional] only needed for PRIVATE
 	AutoReconnect bool            // [optional]
 	Debug         bool            // [optional]
@@ -156,11 +157,12 @@ type Event struct {
 
 // TODO add unsubscribe and take care Event Responses
 func (s *Stream) Read() {
-	ctx, cancel := context.WithTimeout(s.ctx, 30*time.Second)
-	defer cancel()
-
+	/*
+		ctx, cancel := context.WithTimeout(s.ctx, 30*time.Second)
+		defer cancel()
+	*/
 	for {
-		_, data, err := s.conn.Read(ctx)
+		_, data, err := s.conn.Read(s.ctx)
 
 		if err != nil {
 			if s.debugMode {

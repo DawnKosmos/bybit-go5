@@ -28,7 +28,7 @@ func TestPing(t *testing.T) {
 		t.FailNow()
 	}
 
-	err = ws.PublicTrade("BTCsUSDT", func(e *models.WsTrade) {
+	err = ws.PublicTrade("BTCUSDT", func(e *models.WsTrade) {
 		fmt.Println(e.Ts, e.Data)
 	})
 

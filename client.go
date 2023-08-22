@@ -57,8 +57,8 @@ func (c *Client) GET(path string, queryParameters any, result any) (err error) {
 	if err != nil {
 		return err
 	}
-
 	//Adds QueryParameters
+
 	if queryParameters != nil {
 		v, err := query.Values(queryParameters)
 		if err != nil {

@@ -50,14 +50,16 @@ func (s *Stream) reconnect() {
 	notify := s.disconnect
 	<-notify
 	s.setIsConnected(false)
-
 	log.Println("disconnect, reconnect...")
-
 	close(s.heartCancel)
-
 	time.Sleep(1 * time.Second)
+	if err := s.start(); s.debugMode && err != nil {
+		log.Println(err)
+	}
 
-	s.start()
+	if err := s.resubscribe(); s.debugMode && err != nil {
+		log.Println(err)
+	}
 }
 
 func (s *Stream) ReturnSyncMap() *sync.Map {
