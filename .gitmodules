@@ -1,0 +1,3 @@
+[submodule "libs/bybit-docs"]
+	path = libs/bybit-docs
+	url = https://github.com/bybit-exchange/docs.git
