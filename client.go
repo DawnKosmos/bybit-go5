@@ -141,7 +141,7 @@ func (c *Client) POST(path string, queryJson any, result any) (err error) {
 
 	defer resp.Body.Close()
 	if resp.StatusCode >= 400 && resp.StatusCode < 405 {
-		return errors.New(fmt.Sprintf("Error Code received: %d", resp.StatusCode))
+		return fmt.Errorf("Error Code received: %d", resp.StatusCode)
 	}
 
 	//Read Json Body and Unmarshal

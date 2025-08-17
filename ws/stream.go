@@ -122,7 +122,8 @@ func (s *Stream) start() error {
 }
 
 func (s *Stream) connect() (*websocket.Conn, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	conn, _, err := websocket.Dial(ctx, s.Link, &websocket.DialOptions{})
 	if err == nil {
 		conn.SetReadLimit(READLIMIT)
@@ -134,7 +135,7 @@ func (s *Stream) connect() (*websocket.Conn, error) {
 func (s *Stream) Send(request any) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("%v", r))
+			err = fmt.Errorf("%v", r)
 		}
 	}()
 

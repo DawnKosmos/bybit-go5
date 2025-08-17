@@ -2,6 +2,7 @@
 
 # Path to the Bybit docs submodule
 SUBMODULE_PATH := libs/bybit-docs
+DOCS_ROOT := $(SUBMODULE_PATH)/docs/v5
 
 # Initialize the submodule (first-time clone or after fresh checkout)
 submodule-init:
@@ -17,3 +18,17 @@ submodule-update:
 # Show current submodule revision(s)
 submodule-status:
 	git submodule status --recursive
+
+.PHONY: generate check regen
+
+# Generate code from docs into models/ and client_*.go files
+generate:
+	go run ./cmd/bybitgen --docs-root=$(DOCS_ROOT) --out-models=models --out-client=.
+
+# Basic checks (no network tests): vet + build
+check:
+	go vet ./...
+	go build ./...
+
+# Update docs, regenerate, and run checks
+regen: submodule-update generate check
