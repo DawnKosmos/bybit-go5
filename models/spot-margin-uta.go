@@ -7,7 +7,14 @@ type GetSpotMarginTradeCollateralRequest struct {
 }
 
 type GetSpotMarginTradeCollateralResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Currency string `json:"currency"` // Coin name
+		CollateralRatioList []struct {
+			MaxQty string `json:"maxQty"` // Upper limit(in coin) of the tiered range, `""` means positive infinity
+			MinQty string `json:"minQty"` // lower limit(in coin) of the tiered range
+			CollateralRatio string `json:"collateralRatio"` // Collateral ratio
+		} `json:"collateralRatioList"`
+	} `json:"list"`
 }
 
 // GET /v5/spot-margin-trade/data
@@ -17,7 +24,18 @@ type GetSpotMarginTradeDataRequest struct {
 }
 
 type GetSpotMarginTradeDataResponse struct {
-	// TODO: fill in response fields parsed from docs
+	VipCoinList []struct {
+		List []struct {
+			Borrowable bool `json:"borrowable"` // Whether it is allowed to be borrowed
+			CollateralRatio string `json:"collateralRatio"` // Due to the new Tiered Collateral value logic, this field will no longer be accurate starting on February 19, 2025. Please refer to [Get Tiered Collateral Ratio](tier-collateral-ratio#)
+			Currency string `json:"currency"` // Coin name
+			HourlyBorrowRate string `json:"hourlyBorrowRate"` // Borrow interest rate per hour
+			LiquidationOrder string `json:"liquidationOrder"` // Liquidation order
+			MarginCollateral bool `json:"marginCollateral"` // Whether it can be used as a margin collateral currency
+			MaxBorrowingAmount string `json:"maxBorrowingAmount"` // Max borrow amount
+		} `json:"list"`
+		VipLevel string `json:"vipLevel"` // Vip level
+	} `json:"vipCoinList"`
 }
 
 // GET /v5/spot-margin-trade/interest-rate-history
@@ -29,7 +47,7 @@ type GetSpotMarginTradeInterestRateHistoryRequest struct {
 }
 
 type GetSpotMarginTradeInterestRateHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"`
 }
 
 // GET /v5/spot-margin-trade/state
@@ -37,7 +55,9 @@ type GetSpotMarginTradeStateRequest struct {
 }
 
 type GetSpotMarginTradeStateResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SpotLeverage string `json:"spotLeverage"` // Spot margin leverage. Returns `""` if the margin trade is turned off
+	SpotMarginMode string `json:"spotMarginMode"` // Spot margin status. `1`: on, `0`: off
+	EffectiveLeverage string `json:"effectiveLeverage"` // actual leverage ratio. Precision retains 2 decimal places, truncate downwards
 }
 
 // POST /v5/spot-margin-trade/set-leverage
@@ -55,6 +75,6 @@ type PostSpotMarginTradeSwitchModeRequest struct {
 }
 
 type PostSpotMarginTradeSwitchModeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SpotMarginMode string `json:"spotMarginMode"` // Spot margin status. `1`: on, `0`: off
 }
 

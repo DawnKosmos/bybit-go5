@@ -11,7 +11,22 @@ type GetAffiliateAffUserListRequest struct {
 }
 
 type GetAffiliateAffUserListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		UserId string `json:"userId"` // user Id
+		RegisterTime string `json:"registerTime"` // user register time
+		Source int64 `json:"source"` // user registration source, from which referrer code
+		Remarks int64 `json:"remarks"` // The remark
+		IsKyc bool `json:"isKyc"` // Whether KYC is completed
+		TakerVol30Day string `json:"takerVol30Day"` // Taker volume in last 30 days (USDT), update at T + 1. All volume related attributes below includes Derivatives, Option, Spot volume
+		MakerVol30Day string `json:"makerVol30Day"` // Maker volume in last 30 days (USDT), update at T + 1
+		TradeVol30Day string `json:"tradeVol30Day"` // Total trading volume in last 30 days (USDT), update at T + 1
+		DepositAmount30Day string `json:"depositAmount30Day"` // Deposit amount in last 30 days (USDT)
+		TakerVol365Day string `json:"takerVol365Day"` // Taker volume in the past year (USDT), update at T + 1
+		MakerVol365Day string `json:"makerVol365Day"` // Maker volume in the past year (USDT), update at T + 1
+		TradeVol365Day string `json:"tradeVol365Day"` // Total trading volume in the past year (USDT), update at T + 1
+		DepositAmount365Day string `json:"depositAmount365Day"` // Total deposit amount in the past year (USDT)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/user/aff-customer-info
@@ -20,6 +35,19 @@ type GetUserAffCustomerInfoRequest struct {
 }
 
 type GetUserAffCustomerInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Uid string `json:"uid"` // UID
+	VipLevel string `json:"vipLevel"` // VIP level
+	TakerVol30Day string `json:"takerVol30Day"` // Taker volume in last 30 days (USDT). All volume related attributes below includes Derivatives, Option, Spot volume
+	MakerVol30Day string `json:"makerVol30Day"` // Maker volume in last 30 days (USDT)
+	TradeVol30Day string `json:"tradeVol30Day"` // Total trading volume in last 30 days (USDT)
+	DepositAmount30Day string `json:"depositAmount30Day"` // Deposit amount in last 30 days (USDT), update in 5 mins
+	TakerVol365Day string `json:"takerVol365Day"` // Taker volume in the past year (USDT)
+	MakerVol365Day string `json:"makerVol365Day"` // Maker volume in the past year (USDT)
+	TradeVol365Day string `json:"tradeVol365Day"` // Total trading volume in the past year (USDT)
+	DepositAmount365Day string `json:"depositAmount365Day"` // Total deposit amount in the past year (USDT), update in 5 mins
+	TotalWalletBalance string `json:"totalWalletBalance"` // Wallet balance range `1`: less than 100 USDT value `2`: [100, 250) USDT value `3`: [250, 500) USDT value `4`: greater than 500 USDT value
+	DepositUpdateTime string `json:"depositUpdateTime"` // The update date time (UTC) of deposit data
+	VolUpdateTime string `json:"volUpdateTime"` // The update date of volume data time (UTC)
+	KycLevel int64 `json:"KycLevel"` // KYC level. `1`, `2`, `0`
 }
 

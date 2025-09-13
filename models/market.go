@@ -13,7 +13,13 @@ type GetMarketAccountRatioRequest struct {
 }
 
 type GetMarketAccountRatioResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		BuyRatio string `json:"buyRatio"` // The ratio of the number of long position
+		SellRatio string `json:"sellRatio"` // The ratio of the number of short position
+		Timestamp string `json:"timestamp"` // Timestamp (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/market/delivery-price
@@ -27,7 +33,13 @@ type GetMarketDeliveryPriceRequest struct {
 }
 
 type GetMarketDeliveryPriceResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		DeliveryPrice string `json:"deliveryPrice"` // Delivery price
+		DeliveryTime string `json:"deliveryTime"` // Delivery timestamp (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/market/funding/history
@@ -40,7 +52,12 @@ type GetMarketFundingHistoryRequest struct {
 }
 
 type GetMarketFundingHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		FundingRate string `json:"fundingRate"` // Funding rate
+		FundingRateTimestamp string `json:"fundingRateTimestamp"` // Funding rate timestamp (ms)
+	} `json:"list"`
 }
 
 // GET /v5/market/historical-volatility
@@ -54,7 +71,12 @@ type GetMarketHistoricalVolatilityRequest struct {
 }
 
 type GetMarketHistoricalVolatilityResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Period int64 `json:"period"` // Period
+		Value string `json:"value"` // Volatility
+		Time string `json:"time"` // Timestamp (ms)
+	} `json:"list"`
 }
 
 // GET /v5/market/index-price-kline
@@ -68,7 +90,9 @@ type GetMarketIndexPriceKlineRequest struct {
 }
 
 type GetMarketIndexPriceKlineResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	Symbol string `json:"symbol"` // Symbol name
+	List [][]string `json:"list"`
 }
 
 // GET /v5/market/instruments-info
@@ -91,7 +115,13 @@ type GetMarketInsuranceRequest struct {
 }
 
 type GetMarketInsuranceResponse struct {
-	// TODO: fill in response fields parsed from docs
+	UpdatedTime string `json:"updatedTime"` // Data updated time (ms)
+	List []struct {
+		Coin string `json:"coin"` // Coin
+		Symbols string `json:"symbols"` // symbols with <code>"BTCUSDT,ETHUSDT,SOLUSDT"</code> mean these contracts are shared with one insurance pool For an isolated insurance pool, it returns one contract
+		Balance string `json:"balance"` // Balance
+		Value string `json:"value"` // USD value
+	} `json:"list"`
 }
 
 // GET /v5/market/kline
@@ -105,7 +135,9 @@ type GetMarketKlineRequest struct {
 }
 
 type GetMarketKlineResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	Symbol string `json:"symbol"` // Symbol name
+	List [][]string `json:"list"`
 }
 
 // GET /v5/market/mark-price-kline
@@ -119,7 +151,9 @@ type GetMarketMarkPriceKlineRequest struct {
 }
 
 type GetMarketMarkPriceKlineResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	Symbol string `json:"symbol"` // Symbol name
+	List [][]string `json:"list"`
 }
 
 // GET /v5/market/open-interest
@@ -134,7 +168,13 @@ type GetMarketOpenInterestRequest struct {
 }
 
 type GetMarketOpenInterestResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	Symbol string `json:"symbol"` // Symbol name
+	List []struct {
+		OpenInterest string `json:"openInterest"` // Open interest. The value is the sum of both sides. The unit of value, e.g., BTCUSD(inverse) is USD, BTCUSDT(linear) is BTC
+		Timestamp string `json:"timestamp"` // The timestamp (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Used to paginate
 }
 
 // GET /v5/market/orderbook
@@ -145,7 +185,19 @@ type GetMarketOrderbookRequest struct {
 }
 
 type GetMarketOrderbookResponse struct {
-	// TODO: fill in response fields parsed from docs
+	S string `json:"s"` // Symbol name
+	B []struct {
+		B0 string `json:"b[0]"` // Bid price
+		B1 string `json:"b[1]"` // Bid size
+	} `json:"b"`
+	A []struct {
+		A0 string `json:"a[0]"` // Ask price
+		A1 string `json:"a[1]"` // Ask size
+	} `json:"a"`
+	Ts int64 `json:"ts"` // The timestamp (ms) that the system generates the data
+	U int64 `json:"u"` // Update ID, is always in sequence For contract, corresponds to `u` in the 500-level [WebSocket orderbook stream](https://bybit-exchange.github.io/docs/v5/websocket/public/orderbook) For spot, corresponds to `u` in the 200-level [WebSocket orderbook stream](https://bybit-exchange.github.io/docs/v5/websocket/public/orderbook)
+	Seq int64 `json:"seq"` // Cross sequence You can use this field to compare different levels orderbook data, and for the smaller seq, then it means the data is generated earlier.
+	Cts int64 `json:"cts"` // The timestamp from the matching engine when this orderbook data is produced. It can be correlated with `T` from [public trade channel](../websocket/public/trade#)
 }
 
 // GET /v5/market/premium-index-price-kline
@@ -159,7 +211,9 @@ type GetMarketPremiumIndexPriceKlineRequest struct {
 }
 
 type GetMarketPremiumIndexPriceKlineResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	Symbol string `json:"symbol"` // Symbol name
+	List [][]string `json:"list"`
 }
 
 // GET /v5/market/price-limit
@@ -169,7 +223,10 @@ type GetMarketPriceLimitRequest struct {
 }
 
 type GetMarketPriceLimitResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Symbol string `json:"symbol"` // Symbol name
+	BuyLmt string `json:"buyLmt"` // Highest Bid Price
+	SellLmt string `json:"sellLmt"` // Lowest Ask Price
+	Ts string `json:"ts"` // timestamp in milliseconds
 }
 
 // GET /v5/market/recent-trade
@@ -182,7 +239,22 @@ type GetMarketRecentTradeRequest struct {
 }
 
 type GetMarketRecentTradeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Products category
+	List []struct {
+		ExecId string `json:"execId"` // Execution ID
+		Symbol string `json:"symbol"` // Symbol name
+		Price string `json:"price"` // Trade price
+		Size string `json:"size"` // Trade size
+		Side string `json:"side"` // Side of taker `Buy`, `Sell`
+		Time string `json:"time"` // Trade time (ms)
+		IsBlockTrade bool `json:"isBlockTrade"` // Whether the trade is block trade
+		IsRPITrade bool `json:"isRPITrade"` // Whether the trade is RPI trade
+		MP string `json:"mP"` // Mark price, unique field for `option`
+		IP string `json:"iP"` // Index price, unique field for `option`
+		MIv string `json:"mIv"` // Mark iv, unique field for `option`
+		Iv string `json:"iv"` // iv, unique field for `option`
+		Seq string `json:"seq"` // cross sequence
+	} `json:"list"`
 }
 
 // GET /v5/market/risk-limit
@@ -193,7 +265,18 @@ type GetMarketRiskLimitRequest struct {
 }
 
 type GetMarketRiskLimitResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Id int64 `json:"id"` // Risk ID
+		Symbol string `json:"symbol"` // Symbol name
+		RiskLimitValue string `json:"riskLimitValue"` // Position limit
+		MaintenanceMargin string `json:"maintenanceMargin"` // Maintain margin rate
+		InitialMargin string `json:"initialMargin"` // Initial margin rate
+		IsLowestRisk int64 `json:"isLowestRisk"` // `1`: true, `0`: false
+		MaxLeverage string `json:"maxLeverage"` // Allowed max leverage
+		MmDeduction string `json:"mmDeduction"` // The maintenance margin deduction value when risk limit tier changed
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/market/tickers
@@ -213,6 +296,7 @@ type GetMarketTimeRequest struct {
 }
 
 type GetMarketTimeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	TimeSecond string `json:"timeSecond"` // Bybit server timestamp (sec)
+	TimeNano string `json:"timeNano"` // Bybit server timestamp (nano)
 }
 

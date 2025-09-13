@@ -10,7 +10,17 @@ type GetCryptoLoanCommonAdjustmentHistoryRequest struct {
 }
 
 type GetCryptoLoanCommonAdjustmentHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		CollateralCurrency string `json:"collateralCurrency"` // Collateral coin
+		Amount string `json:"amount"` // amount
+		AdjustId int64 `json:"adjustId"` // Collateral adjustment transaction ID
+		AdjustTime int64 `json:"adjustTime"` // Adjust timestamp
+		PreLTV string `json:"preLTV"` // LTV before the adjustment
+		AfterLTV string `json:"afterLTV"` // LTV after the adjustment
+		Direction int64 `json:"direction"` // The direction of adjustment, `0`: add collateral; `1`: reduce collateral
+		Status int64 `json:"status"` // The status of adjustment, `1`: success; `2`: processing; `3`: fail
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/crypto-loan-common/collateral-data
@@ -19,7 +29,18 @@ type GetCryptoLoanCommonCollateralDataRequest struct {
 }
 
 type GetCryptoLoanCommonCollateralDataResponse struct {
-	// TODO: fill in response fields parsed from docs
+	CollateralRatioConfigList []struct {
+		CollateralRatioList []struct {
+			CollateralRatio string `json:"collateralRatio"` // Collateral ratio
+			MaxValue string `json:"maxValue"` // Max qty
+			MinValue string `json:"minValue"` // Min qty
+		} `json:"collateralRatioList"`
+		Currencies string `json:"currencies"` // Currenies with the same collateral ratio, e.g., `BTC,ETH,XRP`
+	} `json:"collateralRatioConfigList"`
+	CurrencyLiquidationList []struct {
+		Currency string `json:"currency"` // Coin name
+		LiquidationOrder int64 `json:"liquidationOrder"` // Liquidation order
+	} `json:"currencyLiquidationList"`
 }
 
 // GET /v5/crypto-loan-common/loanable-data
@@ -29,7 +50,24 @@ type GetCryptoLoanCommonLoanableDataRequest struct {
 }
 
 type GetCryptoLoanCommonLoanableDataResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Currency string `json:"currency"` // Coin name
+		FixedBorrowable bool `json:"fixedBorrowable"` // Whether support fixed loan
+		FixedBorrowingAccuracy int64 `json:"fixedBorrowingAccuracy"` // Coin precision for fixed loan
+		FlexibleBorrowable bool `json:"flexibleBorrowable"` // Whether support flexible loan
+		FlexibleBorrowingAccuracy int64 `json:"flexibleBorrowingAccuracy"` // Coin precision for flexible loan
+		MaxBorrowingAmount string `json:"maxBorrowingAmount"` // Max borrow limit
+		MinFixedBorrowingAmount string `json:"minFixedBorrowingAmount"` // Minimum amount for each fixed loan order
+		MinFlexibleBorrowingAmount string `json:"minFlexibleBorrowingAmount"` // Minimum amount for each flexible loan order
+		VipLevel string `json:"vipLevel"` // Vip level
+		FlexibleAnnualizedInterestRate int64 `json:"flexibleAnnualizedInterestRate"` // The annualized interest rate for flexible borrowing. If the loan currency does not support flexible borrowing, it will always be """"
+		AnnualizedInterestRate7D string `json:"annualizedInterestRate7D"` // The lowest annualized interest rate for fixed borrowing for 7 days that the market can currently provide. If there is no lending in the current market, then it is empty string
+		AnnualizedInterestRate14D string `json:"annualizedInterestRate14D"` // The lowest annualized interest rate for fixed borrowing for 14 days that the market can currently provide. If there is no lending in the current market, then it is empty string
+		AnnualizedInterestRate30D string `json:"annualizedInterestRate30D"` // The lowest annualized interest rate for fixed borrowing for 30 days that the market can currently provide. If there is no lending in the current market, then it is empty string
+		AnnualizedInterestRate60D string `json:"annualizedInterestRate60D"` // The lowest annualized interest rate for fixed borrowing for 60 days that the market can currently provide. If there is no lending in the current market, then it is empty string
+		AnnualizedInterestRate90D string `json:"annualizedInterestRate90D"` // The lowest annualized interest rate for fixed borrowing for 90 days that the market can currently provide. If there is no lending in the current market, then it is empty string
+		AnnualizedInterestRate180D string `json:"annualizedInterestRate180D"` // The lowest annualized interest rate for fixed borrowing for 180 days that the market can currently provide. If there is no lending in the current market, then it is empty string
+	} `json:"list"`
 }
 
 // GET /v5/crypto-loan-common/max-collateral-amount
@@ -38,7 +76,7 @@ type GetCryptoLoanCommonMaxCollateralAmountRequest struct {
 }
 
 type GetCryptoLoanCommonMaxCollateralAmountResponse struct {
-	// TODO: fill in response fields parsed from docs
+	MaxCollateralAmount string `json:"maxCollateralAmount"` // Maximum reduction amount
 }
 
 // GET /v5/crypto-loan-common/position
@@ -46,7 +84,28 @@ type GetCryptoLoanCommonPositionRequest struct {
 }
 
 type GetCryptoLoanCommonPositionResponse struct {
-	// TODO: fill in response fields parsed from docs
+	BorrowList []struct {
+		FixedTotalDebt string `json:"fixedTotalDebt"` // Total debt of fixed loan (coin)
+		FixedTotalDebtUSD string `json:"fixedTotalDebtUSD"` // Total debt of fixed loan (USD)
+		FlexibleHourlyInterestRate string `json:"flexibleHourlyInterestRate"` // Flebible loan hourly interest rate
+		FlexibleTotalDebt string `json:"flexibleTotalDebt"` // Total debt of flexible loan (coin)
+		FlexibleTotalDebtUSD string `json:"flexibleTotalDebtUSD"` // Total debt of flexible loan (USD)
+		LoanCurrency string `json:"loanCurrency"` // Loan coin
+	} `json:"borrowList"`
+	CollateralList []struct {
+		Amount string `json:"amount"` // Collateral amount in coin
+		AmountUSD string `json:"amountUSD"` // Collateral amount in USD (after tierd collateral ratio calculation)
+		Currency string `json:"currency"` // Collateral coin
+	} `json:"collateralList"`
+	Ltv string `json:"ltv"` // LTV
+	SupplyList []struct {
+		Amount string `json:"amount"` // Supply amount in coin
+		AmountUSD string `json:"amountUSD"` // Supply amount in USD
+		Currency string `json:"currency"` // Supply coin
+	} `json:"supplyList"`
+	TotalCollateral string `json:"totalCollateral"` // Total collateral amount (USD)
+	TotalDebt string `json:"totalDebt"` // Total debt (fixed + flexible, in USD)
+	TotalSupply string `json:"totalSupply"` // Total supply amount (USD)
 }
 
 // GET /v5/crypto-loan-fixed/borrow-contract-info
@@ -60,7 +119,21 @@ type GetCryptoLoanFixedBorrowContractInfoRequest struct {
 }
 
 type GetCryptoLoanFixedBorrowContractInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		AnnualRate string `json:"annualRate"` // Annual rate for the borrowing
+		AutoRepay string `json:"autoRepay"` // `"true"`: enable auto repay, default; `"false"`: disable auto repay
+		BorrowCurrency string `json:"borrowCurrency"` // Loan coin
+		BorrowTime string `json:"borrowTime"` // Loan order timestamp
+		InterestPaid string `json:"interestPaid"` // Paid interest
+		LoanId string `json:"loanId"` // Loan contract ID
+		OrderId string `json:"orderId"` // Loan order ID
+		RepaymentTime string `json:"repaymentTime"` // Time to repay
+		ResidualPenaltyInterest string `json:"residualPenaltyInterest"` // Unpaid interest
+		ResidualPrincipal string `json:"residualPrincipal"` // Unpaid principal
+		Status int64 `json:"status"` // Loan order status `1`: unrepaid; `2`: fully repaid; `3`: overdue
+		Term string `json:"term"` // Fixed term `7`: 7 days; `14`: 14 days; `30`: 30 days; `90`: 90 days; `180`: 180 days
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/crypto-loan-fixed/borrow-order-info
@@ -74,7 +147,17 @@ type GetCryptoLoanFixedBorrowOrderInfoRequest struct {
 }
 
 type GetCryptoLoanFixedBorrowOrderInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		AnnualRate string `json:"annualRate"` // Annual rate for the borrowing
+		OrderId int64 `json:"orderId"` // Loan order ID
+		OrderTime string `json:"orderTime"` // Order created time
+		FilledQty string `json:"filledQty"` // Filled qty
+		OrderQty string `json:"orderQty"` // Order qty
+		OrderCurrency string `json:"orderCurrency"` // Coin name
+		State int64 `json:"state"` // Borrow order status, `1`: matching; `2`: partially filled and cancelled; `3`: Fully filled; `4`: Cancelled; `5`: fail
+		Term int64 `json:"term"` // Fixed term `7`: 7 days; `14`: 14 days; `30`: 30 days; `90`: 90 days; `180`: 180 days
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/crypto-loan-fixed/borrow-order-quote
@@ -87,7 +170,12 @@ type GetCryptoLoanFixedBorrowOrderQuoteRequest struct {
 }
 
 type GetCryptoLoanFixedBorrowOrderQuoteResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		OrderCurrency string `json:"orderCurrency"` // Coin name
+		Term int64 `json:"term"` // Fixed term `7`: 7 days; `14`: 14 days; `30`: 30 days; `90`: 90 days; `180`: 180 days
+		AnnualRate string `json:"annualRate"` // Annual rate
+		Qty string `json:"qty"` // Quantity
+	} `json:"list"`
 }
 
 // GET /v5/crypto-loan-fixed/repayment-history
@@ -99,7 +187,20 @@ type GetCryptoLoanFixedRepaymentHistoryRequest struct {
 }
 
 type GetCryptoLoanFixedRepaymentHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Details []struct {
+			LoanCurrency string `json:"loanCurrency"` // Loan coin name
+			RepayAmount int64 `json:"repayAmount"` // Repay amount
+			LoanId string `json:"loanId"` // Loan ID. One repayment may involve multiple loan contracts.
+		} `json:"details"`
+		LoanCurrency string `json:"loanCurrency"` // Loan coin name
+		RepayAmount int64 `json:"repayAmount"` // Repay amount
+		RepayId string `json:"repayId"` // Repay order ID
+		RepayStatus int64 `json:"repayStatus"` // Status, `1`: success, `2`: processing, `3`: fail
+		RepayTime int64 `json:"repayTime"` // Repay time
+		RepayType int64 `json:"repayType"` // Repay type, `1`: repay by user; `2`: repay by liquidation; `3`: auto repay; `4`: overdue repay; `5`: repay by delisting; `6`: repay by delay liquidation
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/crypto-loan-fixed/supply-contract-info
@@ -113,7 +214,21 @@ type GetCryptoLoanFixedSupplyContractInfoRequest struct {
 }
 
 type GetCryptoLoanFixedSupplyContractInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		AnnualRate string `json:"annualRate"` // Annual rate for the supply
+		SupplyCurrency string `json:"supplyCurrency"` // Supply coin
+		SupplyTime string `json:"supplyTime"` // Supply timestamp
+		SupplyAmount string `json:"supplyAmount"` // Supply amount
+		InterestPaid string `json:"interestPaid"` // Paid interest
+		SupplyId string `json:"supplyId"` // Supply contract ID
+		OrderId string `json:"orderId"` // Supply order ID
+		RedemptionTime string `json:"redemptionTime"` // Planned time to redeem
+		PenaltyInterest string `json:"penaltyInterest"` // Overdue interest
+		ActualRedemptionTime string `json:"actualRedemptionTime"` // Actual time to redeem
+		Status int64 `json:"status"` // Supply contract status `1`: Supplying; `2`: Redeemed
+		Term string `json:"term"` // Fixed term `7`: 7 days; `14`: 14 days; `30`: 30 days; `90`: 90 days; `180`: 180 days
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/crypto-loan-fixed/supply-order-info
@@ -127,7 +242,17 @@ type GetCryptoLoanFixedSupplyOrderInfoRequest struct {
 }
 
 type GetCryptoLoanFixedSupplyOrderInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		AnnualRate string `json:"annualRate"` // Annual rate for the supply
+		OrderId int64 `json:"orderId"` // Supply order ID
+		OrderTime string `json:"orderTime"` // Order created time
+		FilledQty string `json:"filledQty"` // Filled qty
+		OrderQty string `json:"orderQty"` // Order qty
+		OrderCurrency string `json:"orderCurrency"` // Coin name
+		State int64 `json:"state"` // Supply order status, `1`: matching; `2`: partially filled and cancelled; `3`: Fully filled; `4`: Cancelled; `5`: fail
+		Term int64 `json:"term"` // Fixed term `7`: 7 days; `14`: 14 days; `30`: 30 days; `90`: 90 days; `180`: 180 days
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/crypto-loan-fixed/supply-order-quote
@@ -140,7 +265,12 @@ type GetCryptoLoanFixedSupplyOrderQuoteRequest struct {
 }
 
 type GetCryptoLoanFixedSupplyOrderQuoteResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		OrderCurrency string `json:"orderCurrency"` // Coin name
+		Term int64 `json:"term"` // Fixed term `7`: 7 days; `14`: 14 days; `30`: 30 days; `90`: 90 days; `180`: 180 days
+		AnnualRate string `json:"annualRate"` // Annual rate
+		Qty string `json:"qty"` // Quantity
+	} `json:"list"`
 }
 
 // GET /v5/crypto-loan-flexible/borrow-history
@@ -152,7 +282,14 @@ type GetCryptoLoanFlexibleBorrowHistoryRequest struct {
 }
 
 type GetCryptoLoanFlexibleBorrowHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		BorrowTime int64 `json:"borrowTime"` // The timestamp to borrow
+		InitialLoanAmount string `json:"initialLoanAmount"` // Loan amount
+		LoanCurrency string `json:"loanCurrency"` // Loan coin
+		OrderId string `json:"orderId"` // Loan order ID
+		Status int64 `json:"status"` // Loan order status `1`: success; `2`: processing; `3`: fail
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/crypto-loan-flexible/ongoing-coin
@@ -161,7 +298,11 @@ type GetCryptoLoanFlexibleOngoingCoinRequest struct {
 }
 
 type GetCryptoLoanFlexibleOngoingCoinResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		HourlyInterestRate string `json:"hourlyInterestRate"` // Latest hourly flexible interest rate
+		LoanCurrency string `json:"loanCurrency"` // Loan coin
+		TotalDebt string `json:"totalDebt"` // Unpaid principal and interest
+	} `json:"list"`
 }
 
 // GET /v5/crypto-loan-flexible/repayment-history
@@ -173,7 +314,15 @@ type GetCryptoLoanFlexibleRepaymentHistoryRequest struct {
 }
 
 type GetCryptoLoanFlexibleRepaymentHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		LoanCurrency string `json:"loanCurrency"` // Loan coin
+		RepayAmount string `json:"repayAmount"` // Repayment amount
+		RepayId string `json:"repayId"` // Repayment transaction ID
+		RepayStatus int64 `json:"repayStatus"` // Repayment status, `1`: success; `2`: processing; `3`: fail
+		RepayTime int64 `json:"repayTime"` // Repay timestamp
+		RepayType int64 `json:"repayType"` // Repayment type, `1`: repay by user; `2`: repay by liquidation; `5`: repay by delisting; `6`: repay by delay liquidation
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // POST /v5/crypto-loan-common/adjust-ltv
@@ -184,7 +333,7 @@ type PostCryptoLoanCommonAdjustLtvRequest struct {
 }
 
 type PostCryptoLoanCommonAdjustLtvResponse struct {
-	// TODO: fill in response fields parsed from docs
+	AdjustId int64 `json:"adjustId"` // Collateral adjustment transaction ID
 }
 
 // POST /v5/crypto-loan-fixed/borrow
@@ -198,7 +347,7 @@ type PostCryptoLoanFixedBorrowRequest struct {
 }
 
 type PostCryptoLoanFixedBorrowResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Loan order ID
 }
 
 // POST /v5/crypto-loan-fixed/borrow-order-cancel
@@ -217,7 +366,7 @@ type PostCryptoLoanFixedFullyRepayRequest struct {
 }
 
 type PostCryptoLoanFixedFullyRepayResponse struct {
-	// TODO: fill in response fields parsed from docs
+	RepayId string `json:"repayId"` // Repayment transaction ID
 }
 
 // POST /v5/crypto-loan-fixed/supply
@@ -229,7 +378,7 @@ type PostCryptoLoanFixedSupplyRequest struct {
 }
 
 type PostCryptoLoanFixedSupplyResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Supply order ID
 }
 
 // POST /v5/crypto-loan-fixed/supply-order-cancel
@@ -249,7 +398,7 @@ type PostCryptoLoanFlexibleBorrowRequest struct {
 }
 
 type PostCryptoLoanFlexibleBorrowResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Loan order ID
 }
 
 // POST /v5/crypto-loan-flexible/repay
@@ -259,6 +408,6 @@ type PostCryptoLoanFlexibleRepayRequest struct {
 }
 
 type PostCryptoLoanFlexibleRepayResponse struct {
-	// TODO: fill in response fields parsed from docs
+	RepayId string `json:"repayId"` // Repayment transaction ID
 }
 

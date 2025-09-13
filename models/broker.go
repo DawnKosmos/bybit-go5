@@ -6,7 +6,18 @@ type GetBrokerAccountInfoRequest struct {
 }
 
 type GetBrokerAccountInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SubAcctQty string `json:"subAcctQty"` // The qty of sub account has been created
+	MaxSubAcctQty string `json:"maxSubAcctQty"` // The max limit of sub account can be created
+	BaseFeeRebateRate struct {
+		Spot string `json:"spot"` // Rebate percentage of the base fee for spot, e.g., 10.00%
+		Derivatives string `json:"derivatives"` // Rebate percentage of the base fee for derivatives, e.g., 10.00%
+	} `json:"baseFeeRebateRate"`
+	MarkupFeeRebateRate struct {
+		Spot string `json:"spot"` // Rebate percentage of the mark up fee for spot, e.g., 10.00%
+		Derivatives string `json:"derivatives"` // Rebate percentage of the mark up fee for derivatives, e.g., 10.00%
+		Convert string `json:"convert"` // Rebate percentage of the mark up fee for convert, e.g., 10.00%
+	} `json:"markupFeeRebateRate"`
+	Ts string `json:"ts"` // System timestamp (ms)
 }
 
 // GET /v5/broker/asset/query-sub-member-deposit-record
@@ -22,7 +33,28 @@ type GetBrokerAssetQuerySubMemberDepositRecordRequest struct {
 }
 
 type GetBrokerAssetQuerySubMemberDepositRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Rows []struct {
+		Id string `json:"id"` // Unique ID
+		SubMemberId string `json:"subMemberId"` // Sub account user ID
+		Coin string `json:"coin"` // Coin
+		Chain string `json:"chain"` // Chain
+		Amount string `json:"amount"` // Amount
+		TxID string `json:"txID"` // Transaction ID
+		Status int64 `json:"status"` // Deposit status
+		ToAddress string `json:"toAddress"` // Deposit target address
+		Tag string `json:"tag"` // Tag of deposit target address
+		DepositFee string `json:"depositFee"` // Deposit fee
+		SuccessAt string `json:"successAt"` // Last updated time
+		Confirmations string `json:"confirmations"` // Number of confirmation blocks
+		TxIndex string `json:"txIndex"` // Transaction sequence number
+		BlockHash string `json:"blockHash"` // Hash number on the chain
+		BatchReleaseLimit string `json:"batchReleaseLimit"` // The deposit limit for this coin in this chain. `"-1"` means no limit
+		DepositType string `json:"depositType"` // The deposit type. `0`: normal deposit, `10`: the deposit reaches daily deposit limit, `20`: abnormal deposit
+		FromAddress string `json:"fromAddress"` // From address of deposit, only shown when the deposit comes from on-chain and from address is unique, otherwise gives `""`
+		TaxDepositRecordsId string `json:"taxDepositRecordsId"` // This field is used for tax purposes by Bybit EU (Austria) users， declare tax id
+		TaxStatus int64 `json:"taxStatus"` // This field is used for tax purposes by Bybit EU (Austria) users 0: No reporting required 1: Reporting pending 2: Reporting completed
+	} `json:"rows"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/broker/earnings-info
@@ -36,7 +68,41 @@ type GetBrokerEarningsInfoRequest struct {
 }
 
 type GetBrokerEarningsInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	TotalEarningCat struct {
+		Spot []struct {
+			Coin string `json:"coin"` // Rebate coin name
+			Earning string `json:"earning"` // Rebate amount of the coin
+		} `json:"spot"`
+		Derivatives []struct {
+			Coin string `json:"coin"` // Rebate coin name
+			Earning string `json:"earning"` // Rebate amount of the coin
+		} `json:"derivatives"`
+		Options []struct {
+			Coin string `json:"coin"` // Rebate coin name
+			Earning string `json:"earning"` // Rebate amount of the coin
+		} `json:"options"`
+		Convert []struct {
+			Coin string `json:"coin"` // Rebate coin name
+			Earning string `json:"earning"` // Rebate amount of the coin
+		} `json:"convert"`
+		Total []struct {
+			Coin string `json:"coin"` // Rebate coin name
+			Earning string `json:"earning"` // Rebate amount of the coin
+		} `json:"total"`
+	} `json:"totalEarningCat"`
+	Details []struct {
+		UserId string `json:"userId"` // Sub UID
+		BizType string `json:"bizType"` // Business type. `SPOT`, `DERIVATIVES`, `OPTIONS`, `CONVERT`
+		Symbol string `json:"symbol"` // Symbol name
+		Coin string `json:"coin"` // Rebate coin name
+		Earning string `json:"earning"` // Rebate amount
+		MarkupEarning string `json:"markupEarning"` // Earning generated from markup fee rate
+		BaseFeeEarning string `json:"baseFeeEarning"` // Earning generated from base fee rate
+		OrderId string `json:"orderId"` // Order ID
+		ExecId string `json:"execId"` // Trade ID
+		ExecTime string `json:"execTime"` // Order execution timestamp (ms)
+	} `json:"details"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // POST /v5/broker/award/distribute-award
@@ -61,7 +127,16 @@ type PostBrokerAwardDistributionRecordRequest struct {
 }
 
 type PostBrokerAwardDistributionRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	AccountId string `json:"accountId"` // User ID
+	AwardId string `json:"awardId"` // Voucher ID
+	SpecCode string `json:"specCode"` // Spec code
+	Amount string `json:"amount"` // Amount of voucher
+	IsClaimed bool `json:"isClaimed"` // `true`, `false`
+	StartAt string `json:"startAt"` // Claim start timestamp (sec)
+	EndAt string `json:"endAt"` // Claim end timestamp (sec)
+	EffectiveAt string `json:"effectiveAt"` // Voucher effective timestamp (sec) after claimed
+	IneffectiveAt string `json:"ineffectiveAt"` // Voucher inactive timestamp (sec) after claimed
+	UsedAmount string `json:"usedAmount"` // Amount used by the user
 }
 
 // POST /v5/broker/award/info
@@ -70,6 +145,12 @@ type PostBrokerAwardInfoRequest struct {
 }
 
 type PostBrokerAwardInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Id string `json:"id"` // Voucher ID
+	Coin string `json:"coin"` // Coin
+	AmountUnit string `json:"amountUnit"` // <code>AWARD_AMOUNT_UNIT_USD</code> <code>AWARD_AMOUNT_UNIT_COIN</code>
+	ProductLine string `json:"productLine"` // Product line
+	SubProductLine string `json:"subProductLine"` // Sub product line
+	TotalAmount string `json:"totalAmount"`
+	UsedAmount string `json:"usedAmount"` // Used amount of voucher
 }
 

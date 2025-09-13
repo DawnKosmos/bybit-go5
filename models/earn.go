@@ -9,7 +9,20 @@ type GetEarnOrderRequest struct {
 }
 
 type GetEarnOrderResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Coin string `json:"coin"` // Coin name
+		OrderValue string `json:"orderValue"` // amount
+		OrderType string `json:"orderType"` // `Redeem`, `Stake`
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // Order link ID
+		Status string `json:"status"` // Order status `Success`, `Fail`, `Pending`
+		CreatedAt string `json:"createdAt"` // Order created time, in milliseconds
+		ProductId string `json:"productId"` // Product ID
+		UpdatedAt string `json:"updatedAt"` // Order updated time, in milliseconds
+		SwapOrderValue string `json:"swapOrderValue"` // Swap order value. Only for LST Onchain.
+		EstimateRedeemTime string `json:"estimateRedeemTime"` // Estimate redeem time, in milliseconds. Only for Onchain
+		EstimateStakeTime string `json:"estimateStakeTime"` // Estimate stake time, in milliseconds. Only for Onchain
+	} `json:"list"`
 }
 
 // GET /v5/earn/position
@@ -20,7 +33,20 @@ type GetEarnPositionRequest struct {
 }
 
 type GetEarnPositionResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Coin string `json:"coin"` // Coin name
+		ProductId string `json:"productId"` // Product ID
+		Amount string `json:"amount"` // Total staked amount
+		TotalPnl string `json:"totalPnl"` // Return the profit of the current position. Only has value in Onchain non-LST mode
+		ClaimableYield string `json:"claimableYield"` // Yield accrues on an hourly basis and is distributed at 00:30 UTC daily. If you unstake your assets before yield distribution, any undistributed yield will be credited to your account along with your principal. Onchain products do not return values
+		Id string `json:"id"` // Position Id. Only for Onchain
+		Status string `json:"status"` // `Processing`,`Active`. Only for Onchain
+		OrderId string `json:"orderId"` // Order Id. Only for Onchain
+		EstimateRedeemTime string `json:"estimateRedeemTime"` // Estimate redeem time, in milliseconds. Only for Onchain
+		EstimateStakeTime string `json:"estimateStakeTime"` // Estimate stake time, in milliseconds. Only for Onchain
+		EstimateInterestCalculationTime string `json:"estimateInterestCalculationTime"` // Estimated Interest accrual time, in milliseconds. Only for Onchain
+		SettlementTime string `json:"settlementTime"` // Settlement time, in milliseconds. Only has value for Onchain `Fixed` product
+	} `json:"list"`
 }
 
 // GET /v5/earn/product
@@ -30,7 +56,34 @@ type GetEarnProductRequest struct {
 }
 
 type GetEarnProductResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Category string `json:"category"` // `FlexibleSaving`,`OnChain`
+		EstimateApr string `json:"estimateApr"` // Estimated APR, e.g., `3%`, `4.25%` **Remarks**: 1)The Est. APR provides a dynamic preview of your potential returns, updated every 10 minutes in response to market conditions. 2) Please note that this is an estimate and may differ from the actual APR you will receive. 3) Platform Reward APRs are not shown
+		Coin string `json:"coin"` // Coin name
+		MinStakeAmount string `json:"minStakeAmount"` // Minimum stake amount
+		MaxStakeAmount string `json:"maxStakeAmount"` // Maximum stake amount
+		Precision string `json:"precision"` // Amount precision
+		ProductId string `json:"productId"` // Product ID
+		Status string `json:"status"` // `Available`, `NotAvailable`
+		BonusEvents []struct {
+			Apr string `json:"apr"` // Yesterday's Rewards APR
+			Coin string `json:"coin"` // Reward coin
+			Announcement string `json:"announcement"` // Announcement link
+		} `json:"bonusEvents"`
+		MinRedeemAmount string `json:"minRedeemAmount"` // Minimum redemption amount. Only has value in Onchain LST mode
+		MaxRedeemAmount string `json:"maxRedeemAmount"` // Maximum redemption amount. Only has value in Onchain LST mode
+		Duration string `json:"duration"` // `Fixed`,`Flexible`. Product Type
+		Term int64 `json:"term"` // Unit: Day. Only when duration = `Fixed` for OnChain
+		SwapCoin string `json:"swapCoin"` // swap coin. Only has value in Onchain LST mode
+		SwapCoinPrecision string `json:"swapCoinPrecision"` // swap coin precision. Only has value in Onchain LST mode
+		StakeExchangeRate string `json:"stakeExchangeRate"` // Estimated stake exchange rate. Only has value in Onchain LST mode
+		RedeemExchangeRate string `json:"redeemExchangeRate"` // Estimated redeem exchange rate. Only has value in Onchain LST mode
+		RewardDistributionType string `json:"rewardDistributionType"` // `Simple`: Simple interest, `Compound`: Compound interest, `Other`: LST. Only has value for Onchain
+		RewardIntervalMinute int64 `json:"rewardIntervalMinute"` // Frequency of reward distribution (minutes)
+		RedeemProcessingMinute string `json:"redeemProcessingMinute"` // Estimated redemption minutes
+		StakeTime string `json:"stakeTime"` // Staking on-chain time, in milliseconds
+		InterestCalculationTime string `json:"interestCalculationTime"` // Interest accrual time, in milliseconds
+	} `json:"list"`
 }
 
 // POST /v5/earn/place-order
@@ -46,6 +99,7 @@ type PostEarnPlaceOrderRequest struct {
 }
 
 type PostEarnPlaceOrderResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Order ID
+	OrderLinkId string `json:"orderLinkId"` // Order link ID
 }
 

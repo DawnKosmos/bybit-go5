@@ -13,7 +13,28 @@ type GetPreUpgradeAccountTransactionLogRequest struct {
 }
 
 type GetPreUpgradeAccountTransactionLogResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		Category string `json:"category"` // Product type
+		Side string `json:"side"` // Side. `Buy`,`Sell`,`None`
+		TransactionTime string `json:"transactionTime"` // Transaction timestamp (ms)
+		Type string `json:"type"` // Type
+		Qty string `json:"qty"` // Quantity
+		Size string `json:"size"` // Size
+		Currency string `json:"currency"` // USDC、USDT、BTC、ETH
+		TradePrice string `json:"tradePrice"` // Trade price
+		Funding string `json:"funding"` // Funding fee Positive value means receiving funding fee Negative value means deducting funding fee
+		Fee string `json:"fee"` // Trading fee Positive fee value means expense Negative fee value means rebates
+		CashFlow string `json:"cashFlow"` // Cash flow
+		Change string `json:"change"` // Change
+		CashBalance string `json:"cashBalance"` // Cash balance
+		FeeRate string `json:"feeRate"` // When type=`TRADE`, then it is trading fee rate When type=`SETTLEMENT`, it means funding fee rate. For side=Buy, feeRate=market fee rate; For side=Sell, feeRate= - market fee rate
+		BonusChange string `json:"bonusChange"` // The change of bonus
+		TradeId string `json:"tradeId"` // Trade ID
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used for pagination
 }
 
 // GET /v5/pre-upgrade/asset/delivery-record
@@ -26,7 +47,18 @@ type GetPreUpgradeAssetDeliveryRecordRequest struct {
 }
 
 type GetPreUpgradeAssetDeliveryRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		DeliveryTime string `json:"deliveryTime"` // Delivery time (ms)
+		Symbol string `json:"symbol"` // Symbol name
+		Side string `json:"side"` // `Buy`,`Sell`
+		Position string `json:"position"` // Executed size
+		DeliveryPrice string `json:"deliveryPrice"` // Delivery price
+		Strike string `json:"strike"` // Exercise price
+		Fee string `json:"fee"` // Trading fee
+		DeliveryRpl string `json:"deliveryRpl"` // Realized PnL of the delivery
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used for pagination
 }
 
 // GET /v5/pre-upgrade/asset/settlement-record
@@ -38,7 +70,17 @@ type GetPreUpgradeAssetSettlementRecordRequest struct {
 }
 
 type GetPreUpgradeAssetSettlementRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		Side string `json:"side"` // `Buy`,`Sell`
+		Size string `json:"size"` // Position size
+		SessionAvgPrice string `json:"sessionAvgPrice"` // Settlement price
+		MarkPrice string `json:"markPrice"` // Mark price
+		RealisedPnl string `json:"realisedPnl"` // Realised PnL
+		CreatedTime string `json:"createdTime"` // Created time (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used for pagination
 }
 
 // GET /v5/pre-upgrade/execution/list
@@ -56,7 +98,35 @@ type GetPreUpgradeExecutionListRequest struct {
 }
 
 type GetPreUpgradeExecutionListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customized order ID
+		Side string `json:"side"` // Side. `Buy`,`Sell`
+		OrderPrice string `json:"orderPrice"` // Order price
+		OrderQty string `json:"orderQty"` // Order qty
+		LeavesQty string `json:"leavesQty"` // The remaining qty not executed
+		OrderType string `json:"orderType"` // Order type. `Market`,`Limit`
+		StopOrderType string `json:"stopOrderType"` // Stop order type. If the order is not stop order, any type is not returned
+		ExecFee string `json:"execFee"` // Executed trading fee
+		ExecId string `json:"execId"` // Execution ID
+		ExecPrice string `json:"execPrice"` // Execution price
+		ExecQty string `json:"execQty"` // Execution qty
+		ExecType string `json:"execType"` // Executed type
+		ExecValue string `json:"execValue"` // Executed order value
+		ExecTime string `json:"execTime"` // Executed timestamp (ms)
+		IsMaker bool `json:"isMaker"` // Is maker order. `true`: maker, `false`: taker
+		FeeRate string `json:"feeRate"` // Trading fee rate
+		TradeIv string `json:"tradeIv"` // Implied volatility
+		MarkIv string `json:"markIv"` // Implied volatility of mark price
+		MarkPrice string `json:"markPrice"` // The mark price of the symbol when executing
+		IndexPrice string `json:"indexPrice"` // The index price of the symbol when executing
+		UnderlyingPrice string `json:"underlyingPrice"` // The underlying price of the symbol when executing
+		BlockTradeId string `json:"blockTradeId"` // Paradigm block trade ID
+		ClosedSize string `json:"closedSize"` // Closed position size
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/pre-upgrade/order/history
@@ -75,7 +145,48 @@ type GetPreUpgradeOrderHistoryRequest struct {
 }
 
 type GetPreUpgradeOrderHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+		BlockTradeId string `json:"blockTradeId"` // Block trade ID
+		Symbol string `json:"symbol"` // Symbol name
+		Price string `json:"price"` // Order price
+		Qty string `json:"qty"` // Order qty
+		Side string `json:"side"` // Side. `Buy`,`Sell`
+		IsLeverage string `json:"isLeverage"` // Useless field for those orders before upgraded
+		PositionIdx int64 `json:"positionIdx"` // Position index. Used to identify positions in different position modes
+		OrderStatus string `json:"orderStatus"` // Order status
+		CancelType string `json:"cancelType"` // Cancel type
+		RejectReason string `json:"rejectReason"` // Reject reason
+		AvgPrice string `json:"avgPrice"` // Average filled price. If unfilled, it is `""`, and also for those orders have partilly filled but cancelled at the end
+		LeavesQty string `json:"leavesQty"` // The remaining qty not executed
+		LeavesValue string `json:"leavesValue"` // The estimated value not executed
+		CumExecQty string `json:"cumExecQty"` // Cumulative executed order qty
+		CumExecValue string `json:"cumExecValue"` // Cumulative executed order value
+		CumExecFee string `json:"cumExecFee"` // Cumulative executed trading fee
+		TimeInForce string `json:"timeInForce"` // Time in force
+		OrderType string `json:"orderType"` // Order type. `Market`,`Limit`
+		StopOrderType string `json:"stopOrderType"` // Stop order type
+		OrderIv string `json:"orderIv"` // Implied volatility
+		TriggerPrice string `json:"triggerPrice"` // Trigger price. If `stopOrderType`=_TrailingStop_, it is activate price. Otherwise, it is trigger price
+		TakeProfit string `json:"takeProfit"` // Take profit price
+		StopLoss string `json:"stopLoss"` // Stop loss price
+		TpTriggerBy string `json:"tpTriggerBy"` // The price type to trigger take profit
+		SlTriggerBy string `json:"slTriggerBy"` // The price type to trigger stop loss
+		TriggerDirection int64 `json:"triggerDirection"` // Trigger direction. `1`: rise, `2`: fall
+		TriggerBy string `json:"triggerBy"` // The price type of trigger price
+		LastPriceOnCreated string `json:"lastPriceOnCreated"` // Last price when place the order
+		ReduceOnly bool `json:"reduceOnly"` // Reduce only. `true` means reduce position size
+		CloseOnTrigger bool `json:"closeOnTrigger"` // Close on trigger. <a href="https://www.bybit.com/en/help-center/article/Close-On-Trigger-Order">What is a close on trigger order?</a>
+		PlaceType string `json:"placeType"` // Place type, `option` used. `iv`, `price`
+		SmpType string `json:"smpType"` // SMP execution type
+		SmpGroup int64 `json:"smpGroup"` // Smp group ID. If the UID has no group, it is `0` by default
+		SmpOrderId string `json:"smpOrderId"` // The counterparty's orderID which triggers this SMP execution
+		CreatedTime string `json:"createdTime"` // Order created timestamp (ms)
+		UpdatedTime string `json:"updatedTime"` // Order updated timestamp (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/pre-upgrade/position/closed-pnl
@@ -89,6 +200,26 @@ type GetPreUpgradePositionClosedPnlRequest struct {
 }
 
 type GetPreUpgradePositionClosedPnlResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		OrderId string `json:"orderId"` // Order ID
+		Side string `json:"side"` // `Buy`, `Side`
+		Qty string `json:"qty"` // Order qty
+		OrderPrice string `json:"orderPrice"` // Order price
+		OrderType string `json:"orderType"` // Order type. `Market`,`Limit`
+		ExecType string `json:"execType"` // Exec type. `Trade`, `BustTrade`, `SessionSettlePnL`, `Settle`
+		ClosedSize string `json:"closedSize"` // Closed size
+		CumEntryValue string `json:"cumEntryValue"` // Cumulated Position value
+		AvgEntryPrice string `json:"avgEntryPrice"` // Average entry price
+		CumExitValue string `json:"cumExitValue"` // Cumulated exit position value
+		AvgExitPrice string `json:"avgExitPrice"` // Average exit price
+		ClosedPnl string `json:"closedPnl"` // Closed PnL
+		FillCount string `json:"fillCount"` // The number of fills in a single order
+		Leverage string `json:"leverage"` // leverage
+		CreatedTime string `json:"createdTime"` // The created time (ms)
+		UpdatedTime string `json:"updatedTime"` // The updated time (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 

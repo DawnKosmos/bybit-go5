@@ -8,7 +8,15 @@ type GetUserEscrow_sub_membersRequest struct {
 }
 
 type GetUserEscrow_sub_membersResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SubMembers []struct {
+		Uid string `json:"uid"` // 子帳戶userId
+		Username string `json:"username"` // 用戶名
+		MemberType int64 `json:"memberType"` // `12`: 基金託管子帳戶
+		Status int64 `json:"status"` // 帳戶狀態. `1`: 正常 `2`: 登陸封禁 `4`: 凍結
+		AccountMode int64 `json:"accountMode"` // 帳戶模式. `1`: 經典帳戶 `3`: UTA帳戶
+		Remark string `json:"remark"` // 備註
+	} `json:"subMembers"`
+	NextCursor string `json:"nextCursor"` // 下一頁數據的游標. 返回"0"表示沒有更多的數據了
 }
 
 // GET /v5/user/get-member-type
@@ -17,7 +25,10 @@ type GetUserGetMemberTypeRequest struct {
 }
 
 type GetUserGetMemberTypeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Accounts []struct {
+		Uid string `json:"uid"` // Master/Sub user Id
+		AccountType []string `json:"accountType"` // Wallets array. `SPOT`, `CONTRACT`, `FUND`, `OPTION`, `UNIFIED`. Please check above practice to understand the value
+	} `json:"accounts"`
 }
 
 // GET /v5/user/query-api
@@ -25,7 +36,41 @@ type GetUserQueryApiRequest struct {
 }
 
 type GetUserQueryApiResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Id string `json:"id"` // Unique ID. Internal use
+	Note string `json:"note"` // The remark
+	ApiKey string `json:"apiKey"` // Api key
+	ReadOnly int64 `json:"readOnly"` // `0`：Read and Write. `1`：Read only
+	Secret string `json:"secret"` // Always `""`
+	Permissions struct {
+		ContractTrade []string `json:"ContractTrade"` // Permission of contract trade `Order`, `Position`
+		Spot []string `json:"Spot"` // Permission of spot `SpotTrade`
+		Wallet []string `json:"Wallet"` // Permission of wallet `AccountTransfer`, `SubMemberTransfer`(master account), `SubMemberTransferList`(sub account), `Withdraw`(master account)
+		Options []string `json:"Options"` // Permission of USDC Contract. It supports trade option and USDC perpetual. `OptionsTrade`
+		Derivatives []string `json:"Derivatives"` // Unified account has this permission by default `DerivativesTrade` For classic account, it is always `[]`
+		Exchange []string `json:"Exchange"` // Permission of convert `ExchangeHistory`
+		Earn []string `json:"Earn"` // Permission of earn product `Earn`
+		NFT []string `json:"NFT"` // Deprecated, always `[]`
+		BlockTrade []string `json:"BlockTrade"` // Permission of blocktrade. Not applicable to subaccount, always `[]`
+		Affiliate []string `json:"Affiliate"` // Permission of Affiliate. Only affiliate can have this permission, otherwise always `[]`
+		CopyTrading []string `json:"CopyTrading"` // Always `[]` as Master Trader account just use `ContractTrade` to start CopyTrading
+	} `json:"permissions"`
+	Ips []string `json:"ips"`
+	Type int64 `json:"type"` // The type of api key. `1`：personal, `2`：connected to the third-party app
+	DeadlineDay int64 `json:"deadlineDay"` // The remaining valid days of api key. Only for those api key with no IP bound or the password has been changed
+	ExpiredAt string `json:"expiredAt"` // The expiry day of the api key. Only for those api key with no IP bound or the password has been changed
+	CreatedAt string `json:"createdAt"` // The create day of the api key
+	Unified int64 `json:"unified"` // deprecated field
+	Uta int64 `json:"uta"` // Whether the account to which the account upgrade to unified trade account. `0`：regular account; `1`：unified trade account
+	UserID int64 `json:"userID"` // User ID
+	InviterID int64 `json:"inviterID"` // Inviter ID (the UID of the account which invited this account to the platform)
+	VipLevel string `json:"vipLevel"` // VIP Level
+	MktMakerLevel string `json:"mktMakerLevel"` // Market maker level
+	AffiliateID int64 `json:"affiliateID"` // Affiliate Id. `0` represents that there is no binding relationship.
+	RsaPublicKey string `json:"rsaPublicKey"` // Rsa public key
+	IsMaster bool `json:"isMaster"` // If this api key belongs to master account or not
+	ParentUid string `json:"parentUid"` // The main account uid. Returns `"0"` when the endpoint is called by main account
+	KycLevel string `json:"kycLevel"` // Personal account kyc level. `LEVEL_DEFAULT`, `LEVEL_1`， `LEVEL_2`
+	KycRegion string `json:"kycRegion"` // Personal account kyc region
 }
 
 // GET /v5/user/query-sub-members
@@ -33,7 +78,14 @@ type GetUserQuerySubMembersRequest struct {
 }
 
 type GetUserQuerySubMembersResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SubMembers []struct {
+		Uid string `json:"uid"` // Sub user Id
+		Username string `json:"username"` // Username
+		MemberType int64 `json:"memberType"` // `1`: normal sub account, `6`: custodial sub account
+		Status int64 `json:"status"` // The status of the user account `1`: normal `2`: login banned `4`: frozen
+		AccountMode int64 `json:"accountMode"` // The account mode of the user account `1`: classic account `3`: UTA
+		Remark string `json:"remark"` // The remark
+	} `json:"subMembers"`
 }
 
 // GET /v5/user/sub-apikeys
@@ -44,7 +96,34 @@ type GetUserSubApikeysRequest struct {
 }
 
 type GetUserSubApikeysResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Result []struct {
+		Id string `json:"id"` // Unique ID. Internal use
+		Ips string `json:"ips"` // IP bound
+		ApiKey string `json:"apiKey"` // Api key
+		Note string `json:"note"` // The remark
+		Status int64 `json:"status"` // `1`: permanent, `2`: expired, `3`: within the validity period, `4`: expires soon (less than 7 days)
+		ExpiredAt string `json:"expiredAt"` // The expiry day of the api key. Only for those api key with no IP bound or the password has been changed
+		CreatedAt string `json:"createdAt"` // The create day of the api key
+		Type int64 `json:"type"` // The type of api key. `1`: personal, `2`: connected to the third-party app
+		Permissions struct {
+			ContractTrade []string `json:"ContractTrade"` // Permission of contract trade `Order`, `Position`
+			Spot []string `json:"Spot"` // Permission of spot `SpotTrade`
+			Wallet []string `json:"Wallet"` // Permission of wallet `AccountTransfer`, `SubMemberTransferList`
+			Options []string `json:"Options"` // Permission of USDC Contract. It supports trade option and USDC perpetual. `OptionsTrade`
+			Derivatives []string `json:"Derivatives"` // Unified account api key have this permission by default. `DerivativesTrade`
+			Exchange []string `json:"Exchange"` // Permission of convert `ExchangeHistory`
+			Earn []string `json:"Earn"` // Permission of earn product `Earn`
+			CopyTrading []string `json:"CopyTrading"` // Always `[]`, Master Trader uses "Contract" permission to start Copytrading
+			BlockTrade []string `json:"BlockTrade"` // Permission of blocktrade. Not applicable to subaccount, always `[]`
+			NFT []string `json:"NFT"` // Deprecated, always `[]`
+			Affiliate []string `json:"Affiliate"` // Permission of Affiliate. Not applicable to sub account, always `[]`
+		} `json:"permissions"`
+		Secret string `json:"secret"` // Always `"******"`
+		ReadOnly bool `json:"readOnly"` // `true`, `false`
+		DeadlineDay int64 `json:"deadlineDay"` // The remaining valid days of api key. Only for those api key with no IP bound or the password has been changed
+		Flag string `json:"flag"` // Api key type
+	} `json:"result"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/user/submembers
@@ -54,7 +133,15 @@ type GetUserSubmembersRequest struct {
 }
 
 type GetUserSubmembersResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SubMembers []struct {
+		Uid string `json:"uid"` // Sub user Id
+		Username string `json:"username"` // Username
+		MemberType int64 `json:"memberType"` // `1`: standard sub account, `6`: custodial sub account
+		Status int64 `json:"status"` // The status of the user account `1`: normal `2`: login banned `4`: frozen
+		AccountMode int64 `json:"accountMode"` // The account mode of the user account `1`: Classic Account `3`: Unified Trading Account
+		Remark string `json:"remark"` // The remark
+	} `json:"subMembers"`
+	NextCursor string `json:"nextCursor"` // The next page cursor value. "0" means no more pages
 }
 
 // POST /v5/user/create-sub-api
@@ -67,7 +154,23 @@ type PostUserCreateSubApiRequest struct {
 }
 
 type PostUserCreateSubApiResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Id string `json:"id"` // Unique id. Internal used
+	Note string `json:"note"` // The remark
+	ApiKey string `json:"apiKey"` // Api key
+	ReadOnly int64 `json:"readOnly"` // `0`: Read and Write. `1`: Read only
+	Secret string `json:"secret"` // The secret paired with api key. The secret can't be queried by GET api. Please keep it properly
+	Permissions struct {
+		ContractTrade []string `json:"ContractTrade"` // Permisson of contract trade
+		Spot []string `json:"Spot"` // Permisson of spot
+		Wallet []string `json:"Wallet"` // Permisson of wallet
+		Options []string `json:"Options"` // Permission of USDC Contract. It supports trade option and usdc perpetual.
+		Derivatives []string `json:"Derivatives"` // Permission of Unified account
+		Exchange []string `json:"Exchange"` // Permission of convert
+		Earn []string `json:"Earn"` // Permission of earn product
+		CopyTrading []string `json:"CopyTrading"` // Permission of copytrade, **deprecated** always `[]`
+		BlockTrade []string `json:"BlockTrade"` // Permission of blocktrade. Not applicable to sub account, always `[]`
+		NFT []string `json:"NFT"` // Deprecated, always `[]`
+	} `json:"permissions"`
 }
 
 // POST /v5/user/create-sub-member
@@ -81,7 +184,11 @@ type PostUserCreateSubMemberRequest struct {
 }
 
 type PostUserCreateSubMemberResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Uid string `json:"uid"` // Sub user Id
+	Username string `json:"username"` // Give a username of the new sub user id. 6-16 characters, must include both numbers and letters. cannot be the same as the exist or deleted one.
+	MemberType int64 `json:"memberType"` // `1`: normal sub account, `6`: custodial sub account
+	Status int64 `json:"status"` // The status of the user account `1`: normal `2`: login banned `4`: frozen
+	Remark string `json:"remark"` // The remark
 }
 
 // POST /v5/user/del-submember
@@ -128,7 +235,24 @@ type PostUserUpdateApiRequest struct {
 }
 
 type PostUserUpdateApiResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Id string `json:"id"` // Unique id. Internal used
+	Note string `json:"note"` // The remark
+	ApiKey string `json:"apiKey"` // Api key
+	ReadOnly int64 `json:"readOnly"` // `0`：Read and Write. `1`：Read only
+	Secret string `json:"secret"` // Always `""`
+	Permissions struct {
+		ContractTrade []string `json:"ContractTrade"` // Permisson of contract trade
+		Spot []string `json:"Spot"` // Permisson of spot
+		Wallet []string `json:"Wallet"` // Permisson of wallet
+		Options []string `json:"Options"` // Permission of USDC Contract. It supports trade option and usdc perpetual.
+		Derivatives []string `json:"Derivatives"` // Permission of Unified account
+		CopyTrading []string `json:"CopyTrading"` // Permission of copytrade. Not applicable to sub account, always `[]`
+		BlockTrade []string `json:"BlockTrade"` // Permission of blocktrade. Not applicable to sub account, always `[]`
+		Exchange []string `json:"Exchange"` // Permission of convert
+		Earn []string `json:"Earn"` // Permission of Earn
+		NFT []string `json:"NFT"` // Deprecated, always `[]`
+	} `json:"permissions"`
+	Ips []string `json:"ips"`
 }
 
 // POST /v5/user/update-sub-api
@@ -140,6 +264,23 @@ type PostUserUpdateSubApiRequest struct {
 }
 
 type PostUserUpdateSubApiResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Id string `json:"id"` // Unique id. Internal used
+	Note string `json:"note"` // The remark
+	ApiKey string `json:"apiKey"` // Api key
+	ReadOnly int64 `json:"readOnly"` // `0`：Read and Write. `1`：Read only
+	Secret string `json:"secret"` // Always `""`
+	Permissions struct {
+		ContractTrade []string `json:"ContractTrade"` // Permisson of contract trade
+		Spot []string `json:"Spot"` // Permisson of spot
+		Wallet []string `json:"Wallet"` // Permisson of wallet
+		Options []string `json:"Options"` // Permission of USDC Contract. It supports trade option and usdc perpetual.
+		Derivatives []string `json:"Derivatives"` // Permission of Unified account
+		CopyTrading []string `json:"CopyTrading"` // Permission of copytrade
+		BlockTrade []string `json:"BlockTrade"` // Permission of blocktrade. Not applicable to sub account, always `[]`
+		Exchange []string `json:"Exchange"` // Permission of convert
+		Earn []string `json:"Earn"` // Permission of Earn
+		NFT []string `json:"NFT"` // Deprecated, always `[]`
+	} `json:"permissions"`
+	Ips []string `json:"ips"`
 }
 

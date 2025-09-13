@@ -6,14 +6,15 @@ type GetSpreadExecutionListRequest struct {
 	Symbol string `url:"symbol,omitempty"` // Spread combination symbol name
 	OrderId string `url:"orderId,omitempty"` // Spread combination order ID
 	OrderLinkId string `url:"orderLinkId,omitempty"` // User customised order ID
-	StartTime string `url:"startTime,omitempty"` // The start timestamp (ms) startTime and endTime are not passed, return 7 days by default Only startTime is passed, return range between startTime and startTime+7 days Only endTime is passed, return range between endTime-7 days and endTime If both are passed, the rule is endTime - startTime <= 7 days
-	EndTime string `url:"endTime,omitempty"` // The end timestamp (ms)
+	StartTime int64 `url:"startTime,omitempty"` // The start timestamp (ms) startTime and endTime are not passed, return 7 days by default Only startTime is passed, return range between startTime and startTime+7 days Only endTime is passed, return range between endTime-7 days and endTime If both are passed, the rule is endTime - startTime <= 7 days
+	EndTime int64 `url:"endTime,omitempty"` // The end timestamp (ms)
 	Limit int64 `url:"limit,omitempty"` // Limit for parent order data size per page. [`1`, `50`]. Default: `20`
 	Cursor string `url:"cursor,omitempty"` // Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set
 }
 
 type GetSpreadExecutionListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"` // Trade info
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/spread/instrument
@@ -25,7 +26,8 @@ type GetSpreadInstrumentRequest struct {
 }
 
 type GetSpreadInstrumentResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"` // instrument info
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/spread/order/history
@@ -34,14 +36,15 @@ type GetSpreadOrderHistoryRequest struct {
 	BaseCoin string `url:"baseCoin,omitempty"` // Base coin
 	OrderId string `url:"orderId,omitempty"` // Spread combination order ID
 	OrderLinkId string `url:"orderLinkId,omitempty"` // User customised order ID
-	StartTime string `url:"startTime,omitempty"` // The start timestamp (ms) startTime and endTime are not passed, return 7 days by default Only startTime is passed, return range between startTime and startTime+7 days Only endTime is passed, return range between endTime-7 days and endTime If both are passed, the rule is endTime - startTime <= 7 days
-	EndTime string `url:"endTime,omitempty"` // The end timestamp (ms)
+	StartTime int64 `url:"startTime,omitempty"` // The start timestamp (ms) startTime and endTime are not passed, return 7 days by default Only startTime is passed, return range between startTime and startTime+7 days Only endTime is passed, return range between endTime-7 days and endTime If both are passed, the rule is endTime - startTime <= 7 days
+	EndTime int64 `url:"endTime,omitempty"` // The end timestamp (ms)
 	Limit int64 `url:"limit,omitempty"` // Limit for data size per page. [`1`, `50`]. Default: `20`
 	Cursor string `url:"cursor,omitempty"` // Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set
 }
 
 type GetSpreadOrderHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"` // Order info
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/spread/order/realtime
@@ -55,7 +58,8 @@ type GetSpreadOrderRealtimeRequest struct {
 }
 
 type GetSpreadOrderRealtimeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"` // Order info
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/spread/orderbook
@@ -65,7 +69,19 @@ type GetSpreadOrderbookRequest struct {
 }
 
 type GetSpreadOrderbookResponse struct {
-	// TODO: fill in response fields parsed from docs
+	S string `json:"s"` // Spread combination symbol name
+	B []struct {
+		B0 string `json:"b[0]"` // Bid price
+		B1 string `json:"b[1]"` // Bid size
+	} `json:"b"`
+	A []struct {
+		A0 string `json:"a[0]"` // Ask price
+		A1 string `json:"a[1]"` // Ask size
+	} `json:"a"`
+	Ts int64 `json:"ts"` // The timestamp (ms) that the system generates the data
+	U int64 `json:"u"` // Update ID. Is always in sequence. Corresponds to `u` in the 25-level [WebSocket orderbook stream](https://bybit-exchange.github.io/docs/v5/spread/websocket/public/orderbook)
+	Seq int64 `json:"seq"` // Cross sequence
+	Cts int64 `json:"cts"` // The timestamp from the matching engine when this orderbook data is produced. It can be correlated with `T` from [public trade channel](../websocket/public/trade#)
 }
 
 // GET /v5/spread/recent-trade
@@ -75,7 +91,7 @@ type GetSpreadRecentTradeRequest struct {
 }
 
 type GetSpreadRecentTradeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"` // Public trade info
 }
 
 // GET /v5/spread/tickers
@@ -84,7 +100,7 @@ type GetSpreadTickersRequest struct {
 }
 
 type GetSpreadTickersResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"` // Ticker info
 }
 
 // POST /v5/spread/order/amend
@@ -97,7 +113,8 @@ type PostSpreadOrderAmendRequest struct {
 }
 
 type PostSpreadOrderAmendResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Order ID
+	OrderLinkId string `json:"orderLinkId"` // User customised order ID
 }
 
 // POST /v5/spread/order/cancel
@@ -107,7 +124,8 @@ type PostSpreadOrderCancelRequest struct {
 }
 
 type PostSpreadOrderCancelResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Order ID
+	OrderLinkId string `json:"orderLinkId"` // User customised order ID
 }
 
 // POST /v5/spread/order/cancel-all
@@ -117,7 +135,8 @@ type PostSpreadOrderCancelAllRequest struct {
 }
 
 type PostSpreadOrderCancelAllResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"`
+	Success string `json:"success"` // The field can be ignored
 }
 
 // POST /v5/spread/order/create
@@ -132,6 +151,7 @@ type PostSpreadOrderCreateRequest struct {
 }
 
 type PostSpreadOrderCreateResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Spread combination order ID
+	OrderLinkId string `json:"orderLinkId"` // User customised order ID
 }
 

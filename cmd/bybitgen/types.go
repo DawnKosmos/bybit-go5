@@ -9,7 +9,13 @@ type Endpoint struct {
 	Method string // GET or POST
 	Path   string // e.g. /v5/position/list
 	Name   string // Go-friendly base name, e.g. GetPositionList
-	Params []Param
+	Params []Param // request params
+
+	// Response schema parsed from "Response Parameters" table
+	// Top-level fields in result object (e.g., category, nextPageCursor, list)
+	RespTop []Param
+	// Nested fields keyed by their parent top-level field name (e.g., "list" -> [...] )
+	RespNested map[string][]Param
 }
 
 // Param describes a single request parameter parsed from docs.

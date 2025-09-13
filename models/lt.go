@@ -7,7 +7,26 @@ type GetSpotLeverTokenInfoRequest struct {
 }
 
 type GetSpotLeverTokenInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		LtCoin string `json:"ltCoin"` // Abbreviation
+		LtName string `json:"ltName"` // Full name of leveraged token
+		MaxPurchase string `json:"maxPurchase"` // Single maximum purchase amount
+		MinPurchase string `json:"minPurchase"` // Single minimum purchase amount
+		MaxPurchaseDaily string `json:"maxPurchaseDaily"` // Maximum purchase amount in a single day
+		MaxRedeem string `json:"maxRedeem"` // Single Maximum redemption quantity
+		MinRedeem string `json:"minRedeem"` // Single Minimum redemption quantity
+		MaxRedeemDaily string `json:"maxRedeemDaily"` // Maximum redemption quantity in a single day
+		PurchaseFeeRate string `json:"purchaseFeeRate"` // Purchase fee rate
+		RedeemFeeRate string `json:"redeemFeeRate"` // Redeem fee rate
+		LtStatus string `json:"ltStatus"` // Whether the leverage token can be purchased or redeemed
+		FundFee string `json:"fundFee"` // Funding fee charged daily for users holding leveraged token
+		FundFeeTime string `json:"fundFeeTime"` // The time to charge funding fee
+		ManageFeeRate string `json:"manageFeeRate"` // Management fee rate
+		ManageFeeTime string `json:"manageFeeTime"` // The time to charge management fee
+		Value string `json:"value"` // Nominal asset value
+		NetValue string `json:"netValue"` // Net value
+		Total string `json:"total"` // Total purchase upper limit
+	} `json:"list"`
 }
 
 // GET /v5/spot-lever-token/order-record
@@ -22,7 +41,19 @@ type GetSpotLeverTokenOrderRecordRequest struct {
 }
 
 type GetSpotLeverTokenOrderRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		LtCoin string `json:"ltCoin"` // Abbreviation of the LT, such as BTC3L
+		OrderId string `json:"orderId"` // Order ID
+		LtOrderType int64 `json:"ltOrderType"` // LT order type. `1`: purchase, `2`: redeem
+		OrderTime string `json:"orderTime"` // Order time
+		UpdateTime string `json:"updateTime"` // Last update time of the order status
+		LtOrderStatus string `json:"ltOrderStatus"` // Order status. `1`: completed, `2`: in progress, `3`: failed
+		Fee string `json:"fee"` // Trading fees
+		Amount string `json:"amount"` // Order quantity of the LT
+		Value string `json:"value"` // Filled value
+		ValueCoin string `json:"valueCoin"` // Quote coin
+		SerialNo string `json:"serialNo"` // Serial number
+	} `json:"list"`
 }
 
 // GET /v5/spot-lever-token/reference
@@ -31,7 +62,12 @@ type GetSpotLeverTokenReferenceRequest struct {
 }
 
 type GetSpotLeverTokenReferenceResponse struct {
-	// TODO: fill in response fields parsed from docs
+	LtCoin string `json:"ltCoin"` // Abbreviation of the LT, such as BTC3L
+	Nav string `json:"nav"` // net value
+	NavTime string `json:"navTime"` // Update time for net asset value (in milliseconds and UTC time zone)
+	Circulation string `json:"circulation"` // Circulating supply in the secondary market
+	Basket string `json:"basket"` // basket
+	Leverage string `json:"leverage"` // Real leverage calculated by last traded price
 }
 
 // POST /v5/spot-lever-token/purchase
@@ -42,7 +78,14 @@ type PostSpotLeverTokenPurchaseRequest struct {
 }
 
 type PostSpotLeverTokenPurchaseResponse struct {
-	// TODO: fill in response fields parsed from docs
+	LtCoin string `json:"ltCoin"` // Abbreviation of the LT, such as BTC3L
+	LtOrderStatus string `json:"ltOrderStatus"` // Order status. `1`: completed, `2`: in progress, `3`: failed
+	ExecQty string `json:"execQty"` // Executed qty of LT
+	ExecAmt string `json:"execAmt"` // Executed amount of LT
+	Amount string `json:"amount"` // Purchase amount
+	PurchaseId string `json:"purchaseId"` // Order ID
+	SerialNo string `json:"serialNo"` // Serial number, customised order ID
+	ValueCoin string `json:"valueCoin"` // Quote coin
 }
 
 // POST /v5/spot-lever-token/redeem
@@ -53,6 +96,13 @@ type PostSpotLeverTokenRedeemRequest struct {
 }
 
 type PostSpotLeverTokenRedeemResponse struct {
-	// TODO: fill in response fields parsed from docs
+	LtCoin string `json:"ltCoin"` // Abbreviation of the LT
+	LtOrderStatus string `json:"ltOrderStatus"` // Order status. `1`: completed, `2`: in progress, `3`: failed
+	Quantity string `json:"quantity"` // Quantity
+	ExecQty string `json:"execQty"` // LT quantity
+	ExecAmt string `json:"execAmt"` // Executed amount of LT
+	RedeemId string `json:"redeemId"` // Order ID
+	SerialNo string `json:"serialNo"` // Serial number
+	ValueCoin string `json:"valueCoin"` // Quote coin
 }
 

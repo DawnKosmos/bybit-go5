@@ -7,7 +7,25 @@ type GetAssetCoinQueryInfoRequest struct {
 }
 
 type GetAssetCoinQueryInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Rows []struct {
+		Name string `json:"name"` // Coin name
+		Coin string `json:"coin"` // Coin
+		RemainAmount string `json:"remainAmount"` // Maximum withdraw amount per transaction
+		Chains []struct {
+			Chain string `json:"chain"` // Chain
+			ChainType string `json:"chainType"` // Chain type
+			Confirmation string `json:"confirmation"` // Number of confirmations for deposit: Once this number is reached, your funds will be credited to your account and available for trading
+			WithdrawFee string `json:"withdrawFee"` // withdraw fee. _If withdraw fee is empty, It means that this coin does not support withdrawal_
+			DepositMin string `json:"depositMin"` // Min. deposit
+			WithdrawMin string `json:"withdrawMin"` // Min. withdraw
+			MinAccuracy string `json:"minAccuracy"` // The precision of withdraw or deposit
+			ChainDeposit string `json:"chainDeposit"` // The chain status of deposit. `0`: suspend. `1`: normal
+			ChainWithdraw string `json:"chainWithdraw"` // The chain status of withdraw. `0`: suspend. `1`: normal
+			WithdrawPercentageFee string `json:"withdrawPercentageFee"` // The withdraw fee percentage. It is a real figure, e.g., 0.022 means 2.2%
+			ContractAddress string `json:"contractAddress"` // Contract address. `""` means no contract address
+			SafeConfirmNumber string `json:"safeConfirmNumber"` // Number of security confirmations: Once this number is reached, your USD equivalent worth funds will be fully unlocked and available for withdrawal.
+		} `json:"chains"`
+	} `json:"rows"`
 }
 
 // GET /v5/asset/delivery-record
@@ -22,7 +40,19 @@ type GetAssetDeliveryRecordRequest struct {
 }
 
 type GetAssetDeliveryRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		DeliveryTime string `json:"deliveryTime"` // Delivery time (ms)
+		Symbol string `json:"symbol"` // Symbol name
+		Side string `json:"side"` // `Buy`,`Sell`
+		Position string `json:"position"` // Executed size
+		EntryPrice string `json:"entryPrice"` // Avg entry price
+		DeliveryPrice string `json:"deliveryPrice"` // Delivery price
+		Strike string `json:"strike"` // Exercise price
+		Fee string `json:"fee"` // Trading fee
+		DeliveryRpl string `json:"deliveryRpl"` // Realized PnL of the delivery
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/asset/deposit/query-address
@@ -32,7 +62,15 @@ type GetAssetDepositQueryAddressRequest struct {
 }
 
 type GetAssetDepositQueryAddressResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Coin string `json:"coin"` // Coin
+	Chains []struct {
+		ChainType string `json:"chainType"` // Chain type
+		AddressDeposit string `json:"addressDeposit"` // The address for deposit
+		TagDeposit string `json:"tagDeposit"` // Tag of deposit
+		Chain string `json:"chain"` // Chain
+		BatchReleaseLimit string `json:"batchReleaseLimit"` // The deposit limit for this coin in this chain. `"-1"` means no limit
+		ContractAddress string `json:"contractAddress"` // The contract address of the coin. Only display last 6 characters, if there is no contract address, it shows `""`
+	} `json:"chains"`
 }
 
 // GET /v5/asset/deposit/query-internal-record
@@ -46,7 +84,19 @@ type GetAssetDepositQueryInternalRecordRequest struct {
 }
 
 type GetAssetDepositQueryInternalRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Rows []struct {
+		Id string `json:"id"` // ID
+		Type int64 `json:"type"` // `1`: Internal deposit
+		Coin string `json:"coin"` // Deposit coin
+		Amount string `json:"amount"` // Deposit amount
+		Status int64 `json:"status"` // 1=Processing 2=Success 3=deposit failed
+		Address string `json:"address"` // Email address or phone number
+		CreatedTime string `json:"createdTime"` // Deposit created timestamp
+		TxID string `json:"txID"` // Internal transfer transaction ID
+		TaxDepositRecordsId string `json:"taxDepositRecordsId"` // This field is used for tax purposes by Bybit EU (Austria) users， declare tax id
+		TaxStatus int64 `json:"taxStatus"` // This field is used for tax purposes by Bybit EU (Austria) users 0: No reporting required 1: Reporting pending 2: Reporting completed
+	} `json:"rows"`
+	NextPageCursor string `json:"nextPageCursor"` // cursor information: used for pagination. Default value: `""`
 }
 
 // GET /v5/asset/deposit/query-record
@@ -61,7 +111,27 @@ type GetAssetDepositQueryRecordRequest struct {
 }
 
 type GetAssetDepositQueryRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Rows []struct {
+		Coin string `json:"coin"` // Coin
+		Chain string `json:"chain"` // Chain
+		Amount string `json:"amount"` // Amount
+		TxID string `json:"txID"` // Transaction ID
+		Status int64 `json:"status"` // Deposit status
+		ToAddress string `json:"toAddress"` // Deposit target address
+		Tag string `json:"tag"` // Tag of deposit target address
+		DepositFee string `json:"depositFee"` // Deposit fee
+		SuccessAt string `json:"successAt"` // Last updated time
+		Confirmations string `json:"confirmations"` // Number of confirmation blocks
+		TxIndex string `json:"txIndex"` // Transaction sequence number
+		BlockHash string `json:"blockHash"` // Hash number on the chain
+		BatchReleaseLimit string `json:"batchReleaseLimit"` // The deposit limit for this coin in this chain. `"-1"` means no limit
+		DepositType string `json:"depositType"` // The deposit type. `0`: normal deposit, `10`: the deposit reaches daily deposit limit, `20`: abnormal deposit
+		FromAddress string `json:"fromAddress"` // From address of deposit, only shown when the deposit comes from on-chain and from address is unique, otherwise gives `""`
+		TaxDepositRecordsId string `json:"taxDepositRecordsId"` // This field is used for tax purposes by Bybit EU (Austria) users， declare tax id
+		TaxStatus int64 `json:"taxStatus"` // This field is used for tax purposes by Bybit EU (Austria) users 0: No reporting required 1: Reporting pending 2: Reporting completed
+		Id string `json:"id"` // Unique ID
+	} `json:"rows"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/asset/deposit/query-sub-member-address
@@ -72,7 +142,15 @@ type GetAssetDepositQuerySubMemberAddressRequest struct {
 }
 
 type GetAssetDepositQuerySubMemberAddressResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Coin string `json:"coin"` // Coin
+	Chains []struct {
+		ChainType string `json:"chainType"` // Chain type
+		AddressDeposit string `json:"addressDeposit"` // The address for deposit
+		TagDeposit string `json:"tagDeposit"` // Tag of deposit
+		Chain string `json:"chain"` // Chain
+		BatchReleaseLimit string `json:"batchReleaseLimit"` // The deposit limit for this coin in this chain. `"-1"` means no limit
+		ContractAddress string `json:"contractAddress"` // The contract address of the coin. Only display last 6 characters, if there is no contract address, it shows `""`
+	} `json:"chains"`
 }
 
 // GET /v5/asset/deposit/query-sub-member-record
@@ -88,7 +166,27 @@ type GetAssetDepositQuerySubMemberRecordRequest struct {
 }
 
 type GetAssetDepositQuerySubMemberRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Rows []struct {
+		Id string `json:"id"` // Unique ID
+		Coin string `json:"coin"` // Coin
+		Chain string `json:"chain"` // Chain
+		Amount string `json:"amount"` // Amount
+		TxID string `json:"txID"` // Transaction ID
+		Status int64 `json:"status"` // Deposit status
+		ToAddress string `json:"toAddress"` // Deposit target address
+		Tag string `json:"tag"` // Tag of deposit target address
+		DepositFee string `json:"depositFee"` // Deposit fee
+		SuccessAt string `json:"successAt"` // Last updated time
+		Confirmations string `json:"confirmations"` // Number of confirmation blocks
+		TxIndex string `json:"txIndex"` // Transaction sequence number
+		BlockHash string `json:"blockHash"` // Hash number on the chain
+		BatchReleaseLimit string `json:"batchReleaseLimit"` // The deposit limit for this coin in this chain. `"-1"` means no limit
+		DepositType string `json:"depositType"` // The deposit type. `0`: normal deposit, `10`: the deposit reaches daily deposit limit, `20`: abnormal deposit
+		FromAddress string `json:"fromAddress"` // From address of deposit, only shown when the deposit comes from on-chain and from address is unique, otherwise gives `""`
+		TaxDepositRecordsId string `json:"taxDepositRecordsId"` // This field is used for tax purposes by Bybit EU (Austria) users， declare tax id
+		TaxStatus int64 `json:"taxStatus"` // This field is used for tax purposes by Bybit EU (Austria) users 0: No reporting required 1: Reporting pending 2: Reporting completed
+	} `json:"rows"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/asset/exchange/convert-result-query
@@ -98,7 +196,21 @@ type GetAssetExchangeConvertResultQueryRequest struct {
 }
 
 type GetAssetExchangeConvertResultQueryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Result struct {
+		AccountType string `json:"accountType"` // Wallet type
+		ExchangeTxId string `json:"exchangeTxId"` // Exchange tx ID, same as quote tx ID
+		UserId string `json:"userId"` // User ID
+		FromCoin string `json:"fromCoin"` // From coin
+		FromCoinType string `json:"fromCoinType"` // From coin type. `crypto`
+		ToCoin string `json:"toCoin"` // To coin
+		ToCoinType string `json:"toCoinType"` // To coin type. `crypto`
+		FromAmount string `json:"fromAmount"` // From coin amount (amount to sell)
+		ToAmount string `json:"toAmount"` // To coin amount (amount to buy according to exchange rate)
+		ExchangeStatus string `json:"exchangeStatus"` // Exchange status init processing success failure
+		ExtInfo string `json:"extInfo"` // Reserved field, ignored for now
+		ConvertRate string `json:"convertRate"` // Exchange rate
+		CreatedAt string `json:"createdAt"` // Quote created time
+	} `json:"result"`
 }
 
 // GET /v5/asset/exchange/order-record
@@ -110,7 +222,16 @@ type GetAssetExchangeOrderRecordRequest struct {
 }
 
 type GetAssetExchangeOrderRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
+	OrderBody []struct {
+		FromCoin string `json:"fromCoin"` // The currency to convert from
+		FromAmount string `json:"fromAmount"` // The amount to convert from
+		ToCoin string `json:"toCoin"` // The currency to convert to
+		ToAmount string `json:"toAmount"` // The amount to convert to
+		ExchangeRate string `json:"exchangeRate"` // Exchange rate
+		CreatedTime string `json:"createdTime"` // Exchange created timestamp (sec)
+		ExchangeTxId string `json:"exchangeTxId"` // Exchange transaction ID
+	} `json:"orderBody"`
 }
 
 // GET /v5/asset/exchange/query-coin-list
@@ -121,7 +242,7 @@ type GetAssetExchangeQueryCoinListRequest struct {
 }
 
 type GetAssetExchangeQueryCoinListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Coins string `json:"coins"` // Coin spec
 }
 
 // GET /v5/asset/exchange/query-convert-history
@@ -132,7 +253,7 @@ type GetAssetExchangeQueryConvertHistoryRequest struct {
 }
 
 type GetAssetExchangeQueryConvertHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List string `json:"list"` // Array of quotes
 }
 
 // GET /v5/asset/settlement-record
@@ -146,7 +267,17 @@ type GetAssetSettlementRecordRequest struct {
 }
 
 type GetAssetSettlementRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		Side string `json:"side"` // `Buy`,`Sell`
+		Size string `json:"size"` // Position size
+		SessionAvgPrice string `json:"sessionAvgPrice"` // Settlement price
+		MarkPrice string `json:"markPrice"` // Mark price
+		RealisedPnl string `json:"realisedPnl"` // Realised PnL
+		CreatedTime string `json:"createdTime"` // Created time (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/asset/transfer/query-account-coin-balance
@@ -162,7 +293,18 @@ type GetAssetTransferQueryAccountCoinBalanceRequest struct {
 }
 
 type GetAssetTransferQueryAccountCoinBalanceResponse struct {
-	// TODO: fill in response fields parsed from docs
+	AccountType string `json:"accountType"` // Account type
+	BizType int64 `json:"bizType"` // Biz type
+	AccountId string `json:"accountId"` // Account ID
+	MemberId string `json:"memberId"` // Uid
+	Balance struct {
+		Coin string `json:"coin"` // Coin
+		WalletBalance string `json:"walletBalance"` // Wallet balance
+		TransferBalance string `json:"transferBalance"` // Transferable balance
+		Bonus string `json:"bonus"` // bonus
+		TransferSafeAmount string `json:"transferSafeAmount"` // Safe amount to transfer. Keep `""` if not query
+		LtvTransferSafeAmount string `json:"ltvTransferSafeAmount"` // Transferable amount for ins loan account. Keep `""` if not query
+	} `json:"balance"`
 }
 
 // GET /v5/asset/transfer/query-account-coins-balance
@@ -174,7 +316,14 @@ type GetAssetTransferQueryAccountCoinsBalanceRequest struct {
 }
 
 type GetAssetTransferQueryAccountCoinsBalanceResponse struct {
-	// TODO: fill in response fields parsed from docs
+	AccountType string `json:"accountType"` // Account type
+	MemberId string `json:"memberId"` // UserID
+	Balance []struct {
+		Coin string `json:"coin"` // Currency
+		WalletBalance string `json:"walletBalance"` // Wallet balance
+		TransferBalance string `json:"transferBalance"` // Transferable balance
+		Bonus string `json:"bonus"` // Bonus
+	} `json:"balance"`
 }
 
 // GET /v5/asset/transfer/query-asset-info
@@ -184,7 +333,15 @@ type GetAssetTransferQueryAssetInfoRequest struct {
 }
 
 type GetAssetTransferQueryAssetInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Spot struct {
+		Status string `json:"status"` // account status. `ACCOUNT_STATUS_NORMAL`: normal, `ACCOUNT_STATUS_UNSPECIFIED`: banned
+		Assets []struct {
+			Coin string `json:"coin"` // Coin
+			Frozen string `json:"frozen"` // Freeze amount
+			Free string `json:"free"` // Free balance
+			Withdraw string `json:"withdraw"` // Amount in withdrawing
+		} `json:"assets"`
+	} `json:"spot"`
 }
 
 // GET /v5/asset/transfer/query-inter-transfer-list
@@ -199,7 +356,16 @@ type GetAssetTransferQueryInterTransferListRequest struct {
 }
 
 type GetAssetTransferQueryInterTransferListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		TransferId string `json:"transferId"` // Transfer ID
+		Coin string `json:"coin"` // Transferred coin
+		Amount string `json:"amount"` // Transferred amount
+		FromAccountType string `json:"fromAccountType"` // From account type
+		ToAccountType string `json:"toAccountType"` // To account type
+		Timestamp string `json:"timestamp"` // Transfer created timestamp (ms)
+		Status string `json:"status"` // Transfer status
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/asset/transfer/query-sub-member-list
@@ -207,7 +373,8 @@ type GetAssetTransferQuerySubMemberListRequest struct {
 }
 
 type GetAssetTransferQuerySubMemberListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SubMemberIds string `json:"subMemberIds"` // All sub UIDs under the main UID
+	TransferableSubMemberIds string `json:"transferableSubMemberIds"` // All sub UIDs that have universal transfer enabled
 }
 
 // GET /v5/asset/transfer/query-transfer-coin-list
@@ -217,7 +384,7 @@ type GetAssetTransferQueryTransferCoinListRequest struct {
 }
 
 type GetAssetTransferQueryTransferCoinListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []string `json:"list"`
 }
 
 // GET /v5/asset/transfer/query-universal-transfer-list
@@ -232,7 +399,18 @@ type GetAssetTransferQueryUniversalTransferListRequest struct {
 }
 
 type GetAssetTransferQueryUniversalTransferListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		TransferId string `json:"transferId"` // Transfer ID
+		Coin string `json:"coin"` // Transferred coin
+		Amount string `json:"amount"` // Transferred amount
+		FromMemberId string `json:"fromMemberId"` // From UID
+		ToMemberId string `json:"toMemberId"` // TO UID
+		FromAccountType string `json:"fromAccountType"` // From account type
+		ToAccountType string `json:"toAccountType"` // To account type
+		Timestamp string `json:"timestamp"` // Transfer created timestamp (ms)
+		Status string `json:"status"` // Transfer status
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/asset/withdraw/query-record
@@ -248,7 +426,25 @@ type GetAssetWithdrawQueryRecordRequest struct {
 }
 
 type GetAssetWithdrawQueryRecordResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Rows []struct {
+		TxID string `json:"txID"` // Transaction ID. It returns `""` when withdrawal failed, withdrawal cancelled
+		Coin string `json:"coin"` // Coin
+		Chain string `json:"chain"` // Chain
+		Amount string `json:"amount"` // Amount
+		WithdrawFee string `json:"withdrawFee"` // Withdraw fee
+		Status string `json:"status"` // Withdraw status
+		ToAddress string `json:"toAddress"` // To withdrawal address. Shows the Bybit UID for internal transfers
+		Tag string `json:"tag"` // Tag
+		CreateTime string `json:"createTime"` // Withdraw created timestamp (ms)
+		UpdateTime string `json:"updateTime"` // Withdraw updated timestamp (ms)
+		WithdrawId string `json:"withdrawId"` // Withdraw ID
+		WithdrawType int64 `json:"withdrawType"` // Withdraw type. `0`: on chain. `1`: off chain
+		Fee string `json:"fee"`
+		Tax string `json:"tax"`
+		TaxRate string `json:"taxRate"`
+		TaxType string `json:"taxType"`
+	} `json:"rows"`
+	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used for pagination
 }
 
 // GET /v5/asset/withdraw/vasp/list
@@ -256,7 +452,10 @@ type GetAssetWithdrawVaspListRequest struct {
 }
 
 type GetAssetWithdrawVaspListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Vasp []struct {
+		VaspEntityId string `json:"vaspEntityId"` // Receiver platform id. When transfer to Upbit or other exchanges that not in the list, please use vaspEntityId='others'
+		VaspName string `json:"vaspName"` // Receiver platform name
+	} `json:"vasp"`
 }
 
 // GET /v5/asset/withdraw/withdrawable-amount
@@ -265,7 +464,24 @@ type GetAssetWithdrawWithdrawableAmountRequest struct {
 }
 
 type GetAssetWithdrawWithdrawableAmountResponse struct {
-	// TODO: fill in response fields parsed from docs
+	LimitAmountUsd string `json:"limitAmountUsd"` // The frozen amount due to risk, in USD
+	WithdrawableAmount struct {
+		SPOT struct {
+			Coin string `json:"coin"` // Coin name
+			WithdrawableAmount string `json:"withdrawableAmount"` // Amount that can be withdrawn
+			AvailableBalance string `json:"availableBalance"` // Available balance
+		} `json:"SPOT"`
+		FUND struct {
+			Coin string `json:"coin"` // Coin name
+			WithdrawableAmount string `json:"withdrawableAmount"` // Amount that can be withdrawn
+			AvailableBalance string `json:"availableBalance"` // Available balance
+		} `json:"FUND"`
+		UTA struct {
+			Coin string `json:"coin"` // Coin name
+			WithdrawableAmount string `json:"withdrawableAmount"` // Amount that can be withdrawn
+			AvailableBalance string `json:"availableBalance"` // Available balance
+		} `json:"UTA"`
+	} `json:"withdrawableAmount"`
 }
 
 // POST /v5/asset/deposit/deposit-to-account
@@ -274,7 +490,7 @@ type PostAssetDepositDepositToAccountRequest struct {
 }
 
 type PostAssetDepositDepositToAccountResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Status int64 `json:"status"` // Request result: `1`: SUCCESS `0`: FAIL
 }
 
 // POST /v5/asset/exchange/convert-execute
@@ -283,7 +499,8 @@ type PostAssetExchangeConvertExecuteRequest struct {
 }
 
 type PostAssetExchangeConvertExecuteResponse struct {
-	// TODO: fill in response fields parsed from docs
+	QuoteTxId string `json:"quoteTxId"` // Quote transaction ID
+	ExchangeStatus string `json:"exchangeStatus"` // Exchange status init processing success failure
 }
 
 // POST /v5/asset/exchange/quote-apply
@@ -301,7 +518,17 @@ type PostAssetExchangeQuoteApplyRequest struct {
 }
 
 type PostAssetExchangeQuoteApplyResponse struct {
-	// TODO: fill in response fields parsed from docs
+	QuoteTxId string `json:"quoteTxId"` // Quote transaction ID. It is system generated, and it is used to confirm quote and query the result of transaction
+	ExchangeRate string `json:"exchangeRate"` // Exchange rate
+	FromCoin string `json:"fromCoin"` // From coin
+	FromCoinType string `json:"fromCoinType"` // From coin type. `crypto`
+	ToCoin string `json:"toCoin"` // To coin
+	ToCoinType string `json:"toCoinType"` // To coin type. `crypto`
+	FromAmount string `json:"fromAmount"` // From coin amount (amount to sell)
+	ToAmount string `json:"toAmount"` // To coin amount (amount to buy according to exchange rate)
+	ExpiredTime string `json:"expiredTime"` // The expiry time for this quote (15 seconds)
+	RequestId string `json:"requestId"` // Customised request ID
+	ExtTaxAndFee []string `json:"extTaxAndFee"`
 }
 
 // POST /v5/asset/transfer/inter-transfer
@@ -314,7 +541,8 @@ type PostAssetTransferInterTransferRequest struct {
 }
 
 type PostAssetTransferInterTransferResponse struct {
-	// TODO: fill in response fields parsed from docs
+	TransferId string `json:"transferId"` // UUID
+	Status string `json:"status"` // Transfer status `STATUS_UNKNOWN` `SUCCESS` `PENDING` `FAILED`
 }
 
 // POST /v5/asset/transfer/universal-transfer
@@ -329,7 +557,8 @@ type PostAssetTransferUniversalTransferRequest struct {
 }
 
 type PostAssetTransferUniversalTransferResponse struct {
-	// TODO: fill in response fields parsed from docs
+	TransferId string `json:"transferId"` // UUID
+	Status string `json:"status"` // Transfer status `STATUS_UNKNOWN` `SUCCESS` `PENDING` `FAILED`
 }
 
 // POST /v5/asset/withdraw/cancel
@@ -338,7 +567,7 @@ type PostAssetWithdrawCancelRequest struct {
 }
 
 type PostAssetWithdrawCancelResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Status int64 `json:"status"` // `0`: fail. `1`: success
 }
 
 // POST /v5/asset/withdraw/create
@@ -357,6 +586,6 @@ type PostAssetWithdrawCreateRequest struct {
 }
 
 type PostAssetWithdrawCreateResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Id string `json:"id"` // Withdrawal ID
 }
 

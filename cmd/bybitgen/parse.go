@@ -27,6 +27,9 @@ func scanEndpoints(dir string) ([]Endpoint, error) {
 		s := bufio.NewScanner(f)
 		var current *Endpoint
 		inReqTable := false
+		inRespTable := false
+		// Maintain a stack of parent names for response nesting. Index = depth.
+		var respPath []string
 		for s.Scan() {
 			line := strings.TrimSpace(s.Text())
 			// Detect HTTP line
@@ -40,11 +43,21 @@ func scanEndpoints(dir string) ([]Endpoint, error) {
 					current = nil
 				}
 				inReqTable = false
+				inRespTable = false
+				respPath = nil
 				continue
 			}
 			// Detect start of Request Parameters section
 			if strings.HasPrefix(line, "### ") && strings.Contains(strings.ToLower(line), "request parameters") {
 				inReqTable = true
+				inRespTable = false
+				continue
+			}
+			// Detect start of Response Parameters section
+			if strings.HasPrefix(line, "### ") && strings.Contains(strings.ToLower(line), "response parameters") {
+				inRespTable = true
+				inReqTable = false
+				respPath = nil
 				continue
 			}
 			if inReqTable {
@@ -85,6 +98,61 @@ func scanEndpoints(dir string) ([]Endpoint, error) {
 					continue
 				}
 				current.Params = append(current.Params, p)
+			}
+			if inRespTable {
+				if !strings.HasPrefix(line, "|") {
+					// end of table
+					inRespTable = false
+					respPath = nil
+					continue
+				}
+				// skip header and delimiter rows
+				low := strings.ToLower(line)
+				if strings.Contains(line, ":-----") || strings.Contains(low, "parameter | type") || strings.Contains(low, "parameter|type") {
+					continue
+				}
+				if current == nil {
+					continue
+				}
+				if current.RespNested == nil {
+					current.RespNested = make(map[string][]Param)
+				}
+				cells := parseTableRow(line)
+				// Response table typically has 3 columns: name | type | comments
+				if len(cells) < 3 {
+					continue
+				}
+				rawName := cells[0]
+				name, depth := normalizeRespName(rawName)
+				typ := strings.ToLower(stripFormatting(cells[1]))
+				comment := strings.TrimSpace(cells[2])
+				if name == "" || strings.EqualFold(name, "-") {
+					continue
+				}
+				p := Param{
+					Name:    name,
+					Type:    typ,
+					Comment: comment,
+				}
+				if depth == 0 {
+					// top-level
+					current.RespTop = append(current.RespTop, p)
+					// reset and set current path to this top-level name
+					respPath = []string{name}
+					continue
+				}
+				// nested: ensure we have a valid parent path of at least 'depth' elements
+				if len(respPath) < depth {
+					// cannot resolve parent, skip
+					continue
+				}
+				// parent key is join of first 'depth' elements of path
+				parentKey := strings.Join(respPath[:depth], ".")
+				current.RespNested[parentKey] = append(current.RespNested[parentKey], p)
+				// update current path to include this node at its depth level
+				if len(respPath) >= depth {
+					respPath = append(respPath[:depth], name)
+				}
 			}
 		}
 		return nil

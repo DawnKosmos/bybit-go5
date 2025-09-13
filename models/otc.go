@@ -7,7 +7,16 @@ type GetInsLoanEnsureTokensConvertRequest struct {
 }
 
 type GetInsLoanEnsureTokensConvertResponse struct {
-	// TODO: fill in response fields parsed from docs
+	MarginToken []struct {
+		ProductId string `json:"productId"` // Product Id
+		TokenInfo []struct {
+			Token string `json:"token"` // Margin coin
+			ConvertRatioList []struct {
+				Ladder string `json:"ladder"` // ladder
+				ConvertRatio string `json:"convertRatio"` // Margin coin convert ratio
+			} `json:"convertRatioList"`
+		} `json:"tokenInfo"`
+	} `json:"marginToken"`
 }
 
 // GET /v5/ins-loan/loan-order
@@ -19,7 +28,58 @@ type GetInsLoanLoanOrderRequest struct {
 }
 
 type GetInsLoanLoanOrderResponse struct {
-	// TODO: fill in response fields parsed from docs
+	LoanInfo []struct {
+		OrderId string `json:"orderId"` // Loan order ID
+		OrderProductId string `json:"orderProductId"` // Product ID
+		ParentUid string `json:"parentUid"` // The designated UID that was used to bind with the INS loan
+		LoanTime string `json:"loanTime"` // Loan timestamp, in milliseconds
+		LoanCoin string `json:"loanCoin"` // Loan coin
+		LoanAmount string `json:"loanAmount"` // Loan amount
+		UnpaidAmount string `json:"unpaidAmount"` // Unpaid principal
+		UnpaidInterest string `json:"unpaidInterest"` // Unpaid interest
+		RepaidAmount string `json:"repaidAmount"` // Repaid principal
+		RepaidInterest string `json:"repaidInterest"` // Repaid interest
+		InterestRate string `json:"interestRate"` // Daily interest rate
+		Status string `json:"status"` // `1`：outstanding; `2`：paid off
+		Leverage string `json:"leverage"` // The maximum leverage for this loan product
+		SupportSpot string `json:"supportSpot"` // Whether to support spot. `0`:false; `1`:true
+		SupportContract string `json:"supportContract"` // Whether to support contract . `0`:false; `1`:true
+		WithdrawLine string `json:"withdrawLine"` // Restrict line for withdrawal
+		TransferLine string `json:"transferLine"` // Restrict line for transfer
+		SpotBuyLine string `json:"spotBuyLine"` // Restrict line for SPOT buy
+		SpotSellLine string `json:"spotSellLine"` // Restrict line for SPOT sell
+		ContractOpenLine string `json:"contractOpenLine"` // Restrict line for USDT Perpetual open position
+		DeferredLiquidationLine string `json:"deferredLiquidationLine"` // Line for deferred liquidation
+		DeferredLiquidationTime string `json:"deferredLiquidationTime"` // Time for deferred liquidation
+		ReserveToken string `json:"reserveToken"` // Reserve token
+		ReserveQuantity string `json:"reserveQuantity"` // Reserve token qty
+		LiquidationLine string `json:"liquidationLine"` // Line for liquidation
+		StopLiquidationLine string `json:"stopLiquidationLine"` // Line for stop liquidation
+		ContractLeverage string `json:"contractLeverage"` // The allowed default leverage for USDT Perpetual
+		TransferRatio string `json:"transferRatio"` // The transfer ratio for loan funds to transfer from Spot wallet to Contract wallet
+		SpotSymbols []string `json:"spotSymbols"` // The whitelist of spot trading pairs. If there is no whitelist, then "[]"
+		ContractSymbols []string `json:"contractSymbols"` // The whitelist of contract trading pairs If `supportContract`="0", then this is "[]" If there is no whitelist, this is "[]"
+		SupportUSDCContract string `json:"supportUSDCContract"` // Whether to support USDC contract. `"0"`:false; `"1"`:true
+		SupportUSDCOptions string `json:"supportUSDCOptions"` // Whether to support Option. `"0"`:false; `"1"`:true
+		SupportMarginTrading string `json:"supportMarginTrading"` // Whether to support Spot margin trading. `"0"`:false; `"1"`:true
+		USDTPerpetualOpenLine string `json:"USDTPerpetualOpenLine"` // Restrict line to open USDT Perpetual position
+		USDCContractOpenLine string `json:"USDCContractOpenLine"` // Restrict line to open USDC Contract position
+		USDCOptionsOpenLine string `json:"USDCOptionsOpenLine"` // Restrict line to open Option position
+		USDTPerpetualCloseLine string `json:"USDTPerpetualCloseLine"` // Restrict line to trade USDT Perpetual position
+		USDCContractCloseLine string `json:"USDCContractCloseLine"` // Restrict line to trade USDC Contract position
+		USDCOptionsCloseLine string `json:"USDCOptionsCloseLine"` // Restrict line to trade Option position
+		USDCContractSymbols []string `json:"USDCContractSymbols"` // The whitelist of USDC contract trading pairs If no whitelist symbols, it is `[]`, and you can trade any If supportUSDCContract="0", it is `[]`
+		USDCOptionsSymbols []string `json:"USDCOptionsSymbols"` // The whitelist of Option symbols If no whitelisted, it is `[]`, and you can trade any If supportUSDCOptions="0", it is `[]`
+		MarginLeverage string `json:"marginLeverage"` // The allowable maximum leverage for Spot margin
+		USDTPerpetualLeverage []struct {
+			Symbol string `json:"symbol"` // Symbol name
+			Leverage string `json:"leverage"` // Maximum leverage
+		} `json:"USDTPerpetualLeverage"`
+		USDCContractLeverage []struct {
+			Symbol string `json:"symbol"` // Symbol name
+			Leverage string `json:"leverage"` // Maximum leverage
+		} `json:"USDCContractLeverage"`
+	} `json:"loanInfo"`
 }
 
 // GET /v5/ins-loan/ltv-convert
@@ -27,7 +87,25 @@ type GetInsLoanLtvConvertRequest struct {
 }
 
 type GetInsLoanLtvConvertResponse struct {
-	// TODO: fill in response fields parsed from docs
+	LtvInfo []struct {
+		Ltv string `json:"ltv"` // Risk rate ltv is calculated in real time If you have an INS loan, it is highly recommended to query this data every second. Liquidation occurs when it reachs 0.9 (90%)
+		Rst string `json:"rst"` // Remaining liquidation time (UTC time in seconds). When it is not triggered, it is displayed as an empty string.
+		ParentUid string `json:"parentUid"` // The designated Risk Unit ID that was used to bind with the INS loan
+		SubAccountUids []string `json:"subAccountUids"` // Bound user ID
+		UnpaidAmount string `json:"unpaidAmount"` // Total debt(USDT)
+		UnpaidInfo []struct {
+			Token string `json:"token"` // coin
+			UnpaidQty string `json:"unpaidQty"` // Unpaid principle
+			UnpaidInterest string `json:"unpaidInterest"` // Useless field, please ignore this for now
+		} `json:"unpaidInfo"`
+		Balance string `json:"balance"` // Total asset (margin coins converted to USDT). Please read <a href="https://www.bybit.com/en-US/help-center/s/article/Over-the-counter-OTC-Lending">here</a> to understand the calculation
+		BalanceInfo []struct {
+			Token string `json:"token"` // Margin coin
+			Price string `json:"price"` // Margin coin price
+			Qty string `json:"qty"` // Margin coin quantity
+			ConvertedAmount string `json:"convertedAmount"` // Margin conversion amount
+		} `json:"balanceInfo"`
+	} `json:"ltvInfo"`
 }
 
 // GET /v5/ins-loan/product-infos
@@ -36,7 +114,45 @@ type GetInsLoanProductInfosRequest struct {
 }
 
 type GetInsLoanProductInfosResponse struct {
-	// TODO: fill in response fields parsed from docs
+	MarginProductInfo []struct {
+		ProductId string `json:"productId"` // Product ID
+		Leverage string `json:"leverage"` // The maximum leverage for this loan product
+		SupportSpot int64 `json:"supportSpot"` // Whether or not Spot is supported. 0:false; 1:true
+		SupportContract int64 `json:"supportContract"` // Whether USDT Perpetuals are supported. 0:false; 1:true
+		SupportMarginTrading int64 `json:"supportMarginTrading"` // Whether or not Spot margin trading is supported. 0:false; 1:true
+		DeferredLiquidationLine string `json:"deferredLiquidationLine"` // Line for deferred liquidation
+		DeferredLiquidationTime string `json:"deferredLiquidationTime"` // Time for deferred liquidation
+		WithdrawLine string `json:"withdrawLine"` // Restrict line for withdrawal
+		TransferLine string `json:"transferLine"` // Restrict line for transfer
+		SpotBuyLine string `json:"spotBuyLine"` // Restrict line for Spot buy
+		SpotSellLine string `json:"spotSellLine"` // Restrict line for Spot trading
+		ContractOpenLine string `json:"contractOpenLine"` // Restrict line for USDT Perpetual open position
+		LiquidationLine string `json:"liquidationLine"` // Line for liquidation
+		StopLiquidationLine string `json:"stopLiquidationLine"` // Line for stop liquidation
+		ContractLeverage string `json:"contractLeverage"` // The allowed default leverage for USDT Perpetual
+		TransferRatio string `json:"transferRatio"` // The transfer ratio for loan funds to transfer from Spot wallet to Contract wallet
+		SpotSymbols []string `json:"spotSymbols"` // The whitelist of spot trading pairs If `supportSpot`="0", then it returns "[]" If empty array, then you can trade any symbols If not empty, then you can only trade listed symbols
+		ContractSymbols []string `json:"contractSymbols"` // The whitelist of contract trading pairs If `supportContract`="0", then it returns "[]" If empty array, then you can trade any symbols If not empty, then you can only trade listed symbols
+		SupportUSDCContract int64 `json:"supportUSDCContract"` // Whether or not USDC contracts are supported. `'0'`:false; `'1'`:true
+		SupportUSDCOptions int64 `json:"supportUSDCOptions"` // Whether or not Options are supported. `'0'`:false; `'1'`:true
+		USDTPerpetualOpenLine string `json:"USDTPerpetualOpenLine"` // Restrict line to open USDT Perpetual position
+		USDCContractOpenLine string `json:"USDCContractOpenLine"` // Restrict line to open USDC Contract position
+		USDCOptionsOpenLine string `json:"USDCOptionsOpenLine"` // Restrict line to open Option position
+		USDTPerpetualCloseLine string `json:"USDTPerpetualCloseLine"` // Restrict line to trade USDT Perpetual
+		USDCContractCloseLine string `json:"USDCContractCloseLine"` // Restrict line to trade USDC Contract
+		USDCOptionsCloseLine string `json:"USDCOptionsCloseLine"` // Restrict line to trade Option
+		USDCContractSymbols []string `json:"USDCContractSymbols"` // The whitelist of USDC contract trading pairs If `supportContract`="0", then it returns "[]" If no whitelist symbols, it is `[]`, and you can trade any If supportUSDCContract="0", it is `[]`
+		USDCOptionsSymbols []string `json:"USDCOptionsSymbols"` // The whitelist of Option symbols If `supportContract`="0", then it returns "[]" If no whitelisted, it is `[]`, and you can trade any If supportUSDCOptions="0", it is `[]`
+		MarginLeverage string `json:"marginLeverage"` // The allowable maximum leverage for Spot margin trading. If `supportMarginTrading`=0, then it returns ""
+		USDTPerpetualLeverage []struct {
+			Symbol string `json:"symbol"` // Symbol name
+			Leverage string `json:"leverage"` // Maximum leverage
+		} `json:"USDTPerpetualLeverage"`
+		USDCContractLeverage []struct {
+			Symbol string `json:"symbol"` // Symbol name
+			Leverage string `json:"leverage"` // Maximum leverage
+		} `json:"USDCContractLeverage"`
+	} `json:"marginProductInfo"`
 }
 
 // GET /v5/ins-loan/repaid-history
@@ -47,7 +163,15 @@ type GetInsLoanRepaidHistoryRequest struct {
 }
 
 type GetInsLoanRepaidHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	RepayInfo []struct {
+		RepayOrderId string `json:"repayOrderId"` // Repaid order ID
+		RepaidTime string `json:"repaidTime"` // Repaid timestamp (ms)
+		Token string `json:"token"` // Repaid coin
+		Quantity string `json:"quantity"` // Repaid principle
+		Interest string `json:"interest"` // Repaid interest
+		BusinessType string `json:"businessType"` // Repaid type. `1`：normal repayment; `2`：repaid by liquidation
+		Status string `json:"status"` // `1`：success; `2`：fail
+	} `json:"repayInfo"`
 }
 
 // POST /v5/ins-loan/association-uid
@@ -57,6 +181,7 @@ type PostInsLoanAssociationUidRequest struct {
 }
 
 type PostInsLoanAssociationUidResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Uid string `json:"uid"` // UID
+	Operate string `json:"operate"` // `0`: bind, `1`: unbind
 }
 

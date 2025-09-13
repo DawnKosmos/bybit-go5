@@ -12,7 +12,29 @@ type GetPositionClosedPnlRequest struct {
 }
 
 type GetPositionClosedPnlResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		OrderId string `json:"orderId"` // Order ID
+		Side string `json:"side"` // `Buy`, `Sell`
+		Qty string `json:"qty"` // Order qty
+		OrderPrice string `json:"orderPrice"` // Order price
+		OrderType string `json:"orderType"` // Order type. `Market`,`Limit`
+		ExecType string `json:"execType"` // Exec type `Trade`, `BustTrade` `SessionSettlePnL` `Settle`, `MovePosition`
+		ClosedSize string `json:"closedSize"` // Closed size
+		CumEntryValue string `json:"cumEntryValue"` // Cumulated Position value
+		AvgEntryPrice string `json:"avgEntryPrice"` // Average entry price
+		CumExitValue string `json:"cumExitValue"` // Cumulated exit position value
+		AvgExitPrice string `json:"avgExitPrice"` // Average exit price
+		ClosedPnl string `json:"closedPnl"` // Closed PnL
+		FillCount string `json:"fillCount"` // The number of fills in a single order
+		Leverage string `json:"leverage"` // leverage
+		OpenFee string `json:"openFee"` // Open position trading fee
+		CloseFee string `json:"closeFee"` // Close position trading fee
+		CreatedTime string `json:"createdTime"` // The created time (ms)
+		UpdatedTime string `json:"updatedTime"` // The updated time (ms)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/position/get-closed-positions
@@ -26,7 +48,22 @@ type GetPositionGetClosedPositionsRequest struct {
 }
 
 type GetPositionGetClosedPositionsResponse struct {
-	// TODO: fill in response fields parsed from docs
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		Side string `json:"side"` // `Buy`, `Sell`
+		TotalOpenFee string `json:"totalOpenFee"` // Total open fee
+		DeliveryFee string `json:"deliveryFee"` // Delivery fee
+		TotalCloseFee string `json:"totalCloseFee"` // Total close fee
+		Qty string `json:"qty"` // Order qty
+		CloseTime int64 `json:"closeTime"` // The closed time (ms)
+		AvgExitPrice string `json:"avgExitPrice"` // Average exit price
+		DeliveryPrice string `json:"deliveryPrice"` // Delivery price
+		OpenTime int64 `json:"openTime"` // The opened time (ms)
+		AvgEntryPrice string `json:"avgEntryPrice"` // Average entry price
+		TotalPnl string `json:"totalPnl"` // Total PnL
+	} `json:"list"`
 }
 
 // GET /v5/position/list
@@ -40,7 +77,49 @@ type GetPositionListRequest struct {
 }
 
 type GetPositionListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
+	List []struct {
+		PositionIdx int64 `json:"positionIdx"` // Position idx, used to identify positions in different position modes `0`: One-Way Mode `1`: Buy side of both side mode `2`: Sell side of both side mode
+		RiskId int64 `json:"riskId"` // Risk tier ID _for portfolio margin mode, this field returns 0, which means risk limit rules are invalid_
+		RiskLimitValue string `json:"riskLimitValue"` // Risk limit value _for portfolio margin mode, this field returns 0, which means risk limit rules are invalid_
+		Symbol string `json:"symbol"` // Symbol name
+		Side string `json:"side"` // Position side. `Buy`: long, `Sell`: short one-way mode: classic & [UTA1.0](/v5/acct-mode#uta-10)(inverse), an empty position returns `None`. [UTA2.0](/v5/acct-mode#uta-20)(linear, inverse) & [UTA1.0](/v5/acct-mode#uta-10)(linear): either one-way or hedge mode returns an empty string `""` for an empty position.
+		Size string `json:"size"` // Position size, always positive
+		AvgPrice string `json:"avgPrice"` // Average entry price For USDC Perp & Futures, it indicates average entry price, and it will not be changed with 8-hour session settlement
+		PositionValue string `json:"positionValue"` // Position value
+		TradeMode int64 `json:"tradeMode"` // Trade mode Classic & [UTA1.0](/v5/acct-mode#uta-10)(inverse): `0`: cross-margin, `1`: isolated margin [UTA2.0](/v5/acct-mode#uta-20), [UTA1.0](/v5/acct-mode#uta-10)(execpt inverse): deprecated, always `0`, check [Get Account Info](/v5/account/account-info) to know the margin mode
+		AutoAddMargin int64 `json:"autoAddMargin"` // Whether to add margin automatically when using isolated margin mode `0`: false `1`: true
+		PositionStatus string `json:"positionStatus"` // Position status. `Normal`, `Liq`, `Adl`
+		Leverage string `json:"leverage"` // Position leverage _for portfolio margin mode, this field returns "", which means leverage rules are invalid_
+		MarkPrice string `json:"markPrice"` // Mark price
+		LiqPrice string `json:"liqPrice"` // Position liquidation price [UTA2.0](/v5/acct-mode#uta-20)(isolated margin), [UTA1.0](/v5/acct-mode#uta-10)(isolated margin), [UTA1.0](/v5/acct-mode#uta-10)(inverse), Classic account: it is the real price for isolated and cross positions, and keeps `""` when liqPrice <= minPrice or liqPrice >= maxPrice [UTA2.0](/v5/acct-mode#uta-20)(Cross margin), [UTA1.0](/v5/acct-mode#uta-10)(Cross margin): it is an <b>estimated</b> price for cross positions(because the unified mode controls the risk rate according to the account), and keeps `""` when liqPrice <= minPrice or liqPrice >= maxPrice _this field is empty for Portfolio Margin Mode, and no liquidation price will be provided_
+		BustPrice string `json:"bustPrice"` // Bankruptcy price
+		PositionIM string `json:"positionIM"` // Initial margin Classic & [UTA1.0](/v5/acct-mode#uta-10)(inverse): ignore this field UTA portfolio margin mode, it returns ""
+		PositionIMByMp string `json:"positionIMByMp"` // Initial margin calculated by mark price Classic & [UTA1.0](/v5/acct-mode#uta-10)(inverse) : ignore this field UTA portfolio margin mode, it returns ""
+		PositionMM string `json:"positionMM"` // Maintenance margin Classic & [UTA1.0](/v5/acct-mode#uta-10)(inverse): ignore this field UTA portfolio margin mode, it returns ""
+		PositionMMByMp string `json:"positionMMByMp"` // Maintenance margin calculated by mark price Classic & [UTA1.0](/v5/acct-mode#uta-10)(inverse) : ignore this field UTA portfolio margin mode, it returns ""
+		PositionBalance string `json:"positionBalance"` // Position margin Classic & [UTA1.0](/v5/acct-mode#uta-10)(inverse) can refer to this field to get the position initial margin plus position closing fee
+		TakeProfit string `json:"takeProfit"` // Take profit price
+		StopLoss string `json:"stopLoss"` // Stop loss price
+		TrailingStop string `json:"trailingStop"` // Trailing stop (The distance from market price)
+		SessionAvgPrice string `json:"sessionAvgPrice"` // USDC contract session avg price, it is the same figure as avg entry price shown in the web UI
+		Delta string `json:"delta"` // Delta
+		Gamma string `json:"gamma"` // Gamma
+		Vega string `json:"vega"` // Vega
+		Theta string `json:"theta"` // Theta
+		UnrealisedPnl string `json:"unrealisedPnl"` // Unrealised PnL
+		CurRealisedPnl string `json:"curRealisedPnl"` // The realised PnL for the current holding position
+		CumRealisedPnl string `json:"cumRealisedPnl"` // Cumulative realised pnl Futures & Perps: it is the all time cumulative realised P&L Option: always "", meaningless
+		AdlRankIndicator int64 `json:"adlRankIndicator"` // Auto-deleverage rank indicator. <a href="https://www.bybit.com/en-US/help-center/s/article/What-is-Auto-Deleveraging-ADL">What is Auto-Deleveraging?</a>
+		CreatedTime string `json:"createdTime"` // Timestamp of the first time a position was created on this symbol (ms)
+		UpdatedTime string `json:"updatedTime"` // Position updated timestamp (ms)
+		Seq int64 `json:"seq"` // Cross sequence, used to associate each fill and each position update Different symbols may have the same seq, please use seq + symbol to check unique Returns `"-1"` if the symbol has never been traded Returns the seq updated by the last transaction when there are settings like leverage, risk limit
+		IsReduceOnly bool `json:"isReduceOnly"` // Useful when Bybit lower the risk limit `true`: Only allowed to reduce the position. You can consider a series of measures, e.g., lower the risk limit, decrease leverage or reduce the position, add margin, or cancel orders, after these operations, you can call [confirm new risk limit](../v5/position/confirm-mmr#) endpoint to check if your position can be removed the reduceOnly mark `false`: There is no restriction, and it means your position is under the risk when the risk limit is systematically adjusted Only meaningful for isolated margin & cross margin of USDT Perp, USDC Perp, USDC Futures, Inverse Perp and Inverse Futures, meaningless for others
+		MmrSysUpdatedTime string `json:"mmrSysUpdatedTime"` // Useful when Bybit lower the risk limit When isReduceOnly=`true`: the timestamp (ms) when the MMR will be forcibly adjusted by the system When isReduceOnly=`false`: the timestamp when the MMR had been adjusted by system It returns the timestamp when the system operates, and if you manually operate, there is no timestamp Keeps `""` by default, if there was a lower risk limit system adjustment previously, it shows that system operation timestamp Only meaningful for isolated margin & cross margin of USDT Perp, USDC Perp, USDC Futures, Inverse Perp and Inverse Futures, meaningless for others
+		LeverageSysUpdatedTime string `json:"leverageSysUpdatedTime"` // Useful when Bybit lower the risk limit When isReduceOnly=`true`: the timestamp (ms) when the leverage will be forcibly adjusted by the system When isReduceOnly=`false`: the timestamp when the leverage had been adjusted by system It returns the timestamp when the system operates, and if you manually operate, there is no timestamp Keeps `""` by default, if there was a lower risk limit system adjustment previously, it shows that system operation timestamp Only meaningful for isolated margin & cross margin of USDT Perp, USDC Perp, USDC Futures, Inverse Perp and Inverse Futures, meaningless for others
+		TpslMode string `json:"tpslMode"` // deprecated, always "Full"
+	} `json:"list"`
 }
 
 // GET /v5/position/move-history
@@ -56,7 +135,25 @@ type GetPositionMoveHistoryRequest struct {
 }
 
 type GetPositionMoveHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		BlockTradeId string `json:"blockTradeId"` // Block trade ID
+		Category string `json:"category"` // Product type. `linear`, `spot`, `option`
+		OrderId string `json:"orderId"` // Bybit order ID
+		UserId int64 `json:"userId"` // User ID
+		Symbol string `json:"symbol"` // Symbol name
+		Side string `json:"side"` // Order side from taker's perspective. `Buy`, `Sell`
+		Price string `json:"price"` // Order price
+		Qty string `json:"qty"` // Order quantity
+		ExecFee string `json:"execFee"` // The fee for taker or maker in the base currency paid to the Exchange executing the block trade
+		Status string `json:"status"` // Block trade status. `Processing`, `Filled`, `Rejected`
+		ExecId string `json:"execId"` // The unique trade ID from the exchange
+		ResultCode int64 `json:"resultCode"` // The result code of the order. `0` means success
+		ResultMessage string `json:"resultMessage"` // The error message. `""` when resultCode=0
+		CreatedAt string `json:"createdAt"` // The timestamp (ms) when the order is created
+		UpdatedAt string `json:"updatedAt"` // The timestamp (ms) when the order is updated
+		RejectParty string `json:"rejectParty"` // `""` means the status=`Filled` `Taker`, `Maker` when status=`Rejected` `bybit` means error is occurred on the Bybit side
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Used to get the next page data
 }
 
 // POST /v5/position/add-margin
@@ -68,7 +165,29 @@ type PostPositionAddMarginRequest struct {
 }
 
 type PostPositionAddMarginResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	Symbol string `json:"symbol"` // Symbol name
+	PositionIdx int64 `json:"positionIdx"` // Position idx, used to identify positions in different position modes `0`: One-Way Mode `1`: Buy side of both side mode `2`: Sell side of both side mode
+	RiskId int64 `json:"riskId"` // Risk limit ID
+	RiskLimitValue string `json:"riskLimitValue"` // Risk limit value
+	Size string `json:"size"` // Position size
+	AvgPrice string `json:"avgPrice"` // Average entry price
+	LiqPrice string `json:"liqPrice"` // Liquidation price
+	BustPrice string `json:"bustPrice"` // Bankruptcy price
+	MarkPrice string `json:"markPrice"` // Last mark price
+	PositionValue string `json:"positionValue"` // Position value
+	Leverage string `json:"leverage"` // Position leverage
+	AutoAddMargin int64 `json:"autoAddMargin"` // Whether to add margin automatically. `0`: false, `1`: true
+	PositionStatus string `json:"positionStatus"` // Position status. `Normal`, `Liq`, `Adl`
+	PositionIM string `json:"positionIM"` // Initial margin
+	PositionMM string `json:"positionMM"` // Maintenance margin
+	TakeProfit string `json:"takeProfit"` // Take profit price
+	StopLoss string `json:"stopLoss"` // Stop loss price
+	TrailingStop string `json:"trailingStop"` // Trailing stop (The distance from market price)
+	UnrealisedPnl string `json:"unrealisedPnl"` // Unrealised PnL
+	CumRealisedPnl string `json:"cumRealisedPnl"` // Cumulative realised pnl
+	CreatedTime string `json:"createdTime"` // Timestamp of the first time a position was created on this symbol (ms)
+	UpdatedTime string `json:"updatedTime"` // Position updated timestamp (ms)
 }
 
 // POST /v5/position/confirm-pending-mmr
@@ -89,7 +208,9 @@ type PostPositionMovePositionsRequest struct {
 }
 
 type PostPositionMovePositionsResponse struct {
-	// TODO: fill in response fields parsed from docs
+	RetCode int64 `json:"retCode"` // Result code. `0` means request is successfully accepted
+	RetMsg string `json:"retMsg"` // Result message
+	Result string `json:"result"` // Object
 }
 
 // POST /v5/position/set-auto-add-margin
@@ -125,7 +246,9 @@ type PostPositionSetRiskLimitRequest struct {
 }
 
 type PostPositionSetRiskLimitResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	RiskId int64 `json:"riskId"` // Risk limit ID
+	RiskLimitValue string `json:"riskLimitValue"` // The position limit value corresponding to this risk ID
 }
 
 // POST /v5/position/set-tpsl-mode
@@ -136,7 +259,7 @@ type PostPositionSetTpslModeRequest struct {
 }
 
 type PostPositionSetTpslModeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	TpSlMode string `json:"tpSlMode"` // `Full`,`Partial`
 }
 
 // POST /v5/position/switch-isolated

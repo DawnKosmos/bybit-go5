@@ -11,7 +11,9 @@ func normalizeParamName(s string) (string, bool) {
 	}
 	// Rows like "> coin" or "> collateralSwitch" denote nested fields in docs
 	if strings.HasPrefix(n, ">") {
-		return "", true
+		// strip leading '>' and whitespace
+		n = strings.TrimSpace(strings.TrimLeft(n, ">"))
+		return n, true
 	}
 	// Remove leading bullets or dashes
 	for strings.HasPrefix(n, "-") || strings.HasPrefix(n, "•") {
@@ -20,6 +22,24 @@ func normalizeParamName(s string) (string, bool) {
 	// Remove trailing colon
 	n = strings.TrimSuffix(n, ":")
 	return n, false
+}
+
+// normalizeRespName returns the cleaned parameter name and its nesting depth based on leading '>' markers.
+// depth: 0 = top-level, 1 = child ('> field'), 2 = grandchild ('>> field'), etc.
+func normalizeRespName(s string) (string, int) {
+    t := strings.TrimSpace(stripFormatting(s))
+    if t == "" {
+        return "", 0
+    }
+    depth := 0
+    for i := 0; i < len(t) && t[i] == '>'; i++ {
+        depth++
+    }
+    // trim leading '>' and whitespace after them
+    t = strings.TrimSpace(strings.TrimLeft(t, ">"))
+    // Remove trailing colon
+    t = strings.TrimSuffix(t, ":")
+    return t, depth
 }
 
 // parseTableRow splits a Markdown table row "| a | b | c |" into cells.
@@ -71,7 +91,7 @@ func mapType(t string) string {
 	switch tt {
 	case "string", "text":
 		return "string"
-	case "integer", "int", "int32", "int64", "timestamp(ms)", "timestamp":
+	case "integer", "int", "int32", "int64", "long", "timestamp(ms)", "timestamp":
 		return "int64"
 	case "boolean", "bool":
 		return "bool"

@@ -11,7 +11,18 @@ type GetAccountBorrowHistoryRequest struct {
 }
 
 type GetAccountBorrowHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Currency string `json:"currency"` // `USDC`,`USDT`,`BTC`,`ETH`
+		CreatedTime int64 `json:"createdTime"` // Created timestamp (ms)
+		BorrowCost string `json:"borrowCost"` // Interest
+		HourlyBorrowRate string `json:"hourlyBorrowRate"` // Hourly Borrow Rate
+		InterestBearingBorrowSize string `json:"InterestBearingBorrowSize"` // Interest Bearing Borrow Size
+		CostExemption string `json:"costExemption"` // Cost exemption
+		BorrowAmount string `json:"borrowAmount"` // Total borrow amount
+		UnrealisedLoss string `json:"unrealisedLoss"` // Unrealised loss
+		FreeBorrowedAmount string `json:"freeBorrowedAmount"` // The borrowed amount for interest free
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/account/collateral-info
@@ -20,7 +31,22 @@ type GetAccountCollateralInfoRequest struct {
 }
 
 type GetAccountCollateralInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Currency string `json:"currency"` // Currency of all current collateral
+		HourlyBorrowRate string `json:"hourlyBorrowRate"` // Hourly borrow rate
+		MaxBorrowingAmount string `json:"maxBorrowingAmount"` // Max borrow amount. This value is shared across main-sub UIDs
+		FreeBorrowingLimit string `json:"freeBorrowingLimit"` // The maximum limit for interest-free borrowing Only the borrowing caused by contracts unrealised loss has interest-free amount Spot margin borrowing always has interest
+		FreeBorrowAmount string `json:"freeBorrowAmount"` // The amount of borrowing within your total borrowing amount that is exempt from interest charges
+		BorrowAmount string `json:"borrowAmount"` // Borrow amount
+		OtherBorrowAmount string `json:"otherBorrowAmount"` // The sum of borrowing amount for other accounts under the same main account
+		FreeBorrowingAmount string `json:"freeBorrowingAmount"` // deprecated field, always return `""`, please refer to `freeBorrowingLimit`
+		AvailableToBorrow string `json:"availableToBorrow"` // Available amount to borrow. This value is shared across main-sub UIDs
+		Borrowable bool `json:"borrowable"` // Whether currency can be borrowed
+		BorrowUsageRate string `json:"borrowUsageRate"` // Borrow usage rate: sum of main & sub accounts borrowAmount/maxBorrowingAmount, it is an actual value, 0.5 means 50%
+		MarginCollateral bool `json:"marginCollateral"` // Whether it can be used as a margin collateral currency (platform), `true`: YES, `false`: NO When marginCollateral=false, then collateralSwitch is meaningless
+		CollateralSwitch bool `json:"collateralSwitch"` // Whether the collateral is turned on by user (user), `true`: ON, `false`: OFF When marginCollateral=true, then collateralSwitch is meaningful
+		CollateralRatio string `json:"collateralRatio"` // Due to the new Tiered Collateral value logic, this field will no longer be accurate starting on February 19, 2025. Please refer to [Get Tiered Collateral Ratio](../spot-margin-uta/tier-collateral-ratio)
+	} `json:"list"`
 }
 
 // GET /v5/account/contract-transaction-log
@@ -35,7 +61,29 @@ type GetAccountContractTransactionLogRequest struct {
 }
 
 type GetAccountContractTransactionLogResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Id string `json:"id"` // Unique id
+		Symbol string `json:"symbol"` // Symbol name
+		Category string `json:"category"` // Product type
+		Side string `json:"side"` // Side. `Buy`,`Sell`,`None`
+		TransactionTime string `json:"transactionTime"` // Transaction timestamp (ms)
+		Type string `json:"type"` // Type
+		Qty string `json:"qty"` // Quantity Perps & Futures: it is the quantity for each trade entry and it does not have direction
+		Size string `json:"size"` // Size. The rest position size after the trade is executed, and it has direction, i.e., short with "-"
+		Currency string `json:"currency"` // currency
+		TradePrice string `json:"tradePrice"` // Trade price
+		Funding string `json:"funding"` // Funding fee Positive value means deducting funding fee Negative value means receiving funding fee
+		Fee string `json:"fee"` // Trading fee Positive fee value means expense Negative fee value means rebates
+		CashFlow string `json:"cashFlow"` // Cash flow, e.g., (1) close the position, and unRPL converts to RPL, (2) transfer in or transfer out. This does not include trading fee, funding fee
+		Change string `json:"change"` // Change = cashFlow - funding - fee
+		CashBalance string `json:"cashBalance"` // Cash balance. This is the wallet balance after a cash change
+		FeeRate string `json:"feeRate"` // When type=`TRADE`, then it is trading fee rate When type=`SETTLEMENT`, it means funding fee rate. For side=Buy, feeRate=market fee rate; For side=Sell, feeRate= - market fee rate
+		BonusChange string `json:"bonusChange"` // The change of bonus
+		TradeId string `json:"tradeId"` // Trade ID
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/account/fee-rate
@@ -46,7 +94,13 @@ type GetAccountFeeRateRequest struct {
 }
 
 type GetAccountFeeRateResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type. `spot`, `option`. _Derivatives does not have this field_
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name. Keeps `""` for Options
+		BaseCoin string `json:"baseCoin"` // Base coin. `SOL`, `BTC`, `ETH` Derivatives does not have this field Keeps `""` for Spot
+		TakerFeeRate string `json:"takerFeeRate"` // Taker fee rate
+		MakerFeeRate string `json:"makerFeeRate"` // Maker fee rate
+	} `json:"list"`
 }
 
 // GET /v5/account/info
@@ -54,7 +108,14 @@ type GetAccountInfoRequest struct {
 }
 
 type GetAccountInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	UnifiedMarginStatus int64 `json:"unifiedMarginStatus"` // Account status
+	MarginMode string `json:"marginMode"` // `ISOLATED_MARGIN`, `REGULAR_MARGIN`, `PORTFOLIO_MARGIN`
+	IsMasterTrader bool `json:"isMasterTrader"` // Whether this account is a leader (copytrading). `true`, `false`
+	SpotHedgingStatus string `json:"spotHedgingStatus"` // Whether the unified account enables Spot hedging. `ON`, `OFF`
+	UpdatedTime string `json:"updatedTime"` // Account data updated timestamp (ms)
+	DcpStatus string `json:"dcpStatus"` // deprecated, always `OFF`. Please use [Get DCP Info](dcp-info#)
+	TimeWindow int64 `json:"timeWindow"` // deprecated, always `0`. Please use [Get DCP Info](dcp-info#)
+	SmpGroup int64 `json:"smpGroup"` // deprecated, always `0`. Please query [Get SMP Group ID](smp-group#) endpoint
 }
 
 // GET /v5/account/mmp-state
@@ -63,7 +124,16 @@ type GetAccountMmpStateRequest struct {
 }
 
 type GetAccountMmpStateResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Result []struct {
+		BaseCoin string `json:"baseCoin"` // Base coin
+		MmpEnabled bool `json:"mmpEnabled"` // Whether the account is enabled mmp
+		Window string `json:"window"` // Time window (ms)
+		FrozenPeriod string `json:"frozenPeriod"` // Frozen period (ms)
+		QtyLimit string `json:"qtyLimit"` // Trade qty limit
+		DeltaLimit string `json:"deltaLimit"` // Delta limit
+		MmpFrozenUntil string `json:"mmpFrozenUntil"` // Unfreeze timestamp (ms)
+		MmpFrozen bool `json:"mmpFrozen"` // Whether the mmp is triggered. `true`: mmpFrozenUntil is meaningful `false`: please ignore the value of mmpFrozenUntil
+	} `json:"result"`
 }
 
 // GET /v5/account/query-dcp-info
@@ -71,7 +141,7 @@ type GetAccountQueryDcpInfoRequest struct {
 }
 
 type GetAccountQueryDcpInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	DcpInfos string `json:"dcpInfos"` // DCP config for each product
 }
 
 // GET /v5/account/smp-group
@@ -79,7 +149,7 @@ type GetAccountSmpGroupRequest struct {
 }
 
 type GetAccountSmpGroupResponse struct {
-	// TODO: fill in response fields parsed from docs
+	SmpGroup int64 `json:"smpGroup"` // Smp group ID. If the UID has no group, it is `0` by default
 }
 
 // GET /v5/account/transaction-log
@@ -96,7 +166,31 @@ type GetAccountTransactionLogRequest struct {
 }
 
 type GetAccountTransactionLogResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Id string `json:"id"` // Unique id
+		Symbol string `json:"symbol"` // Symbol name
+		Category string `json:"category"` // Product type
+		Side string `json:"side"` // Side. `Buy`,`Sell`,`None`
+		TransactionTime string `json:"transactionTime"` // Transaction timestamp (ms)
+		Type string `json:"type"` // Type
+		TransSubType string `json:"transSubType"` // Transaction sub type, `movePosition`, used for the logs generated by move position. `""` by default
+		Qty string `json:"qty"` // Quantity Spot: the negative means the qty of this currency is decreased, the positive means the qty of this currency is increased Perps & Futures: it is the quantity for each trade entry and it does not have direction
+		Size string `json:"size"` // Size. The rest position size after the trade is executed, and it has direction, i.e., short with "-"
+		Currency string `json:"currency"` // e.g., USDC, USDT, BTC, ETH
+		TradePrice string `json:"tradePrice"` // Trade price
+		Funding string `json:"funding"` // Funding fee Positive fee value means an expense; negative fee value means a rebate. This is opposite to the `execFee` from [Get Trade History](https://bybit-exchange.github.io/docs/v5/order/execution). For USDC Perp, as funding settlement and session settlement occur at the same time, they are represented in a single record at settlement. Please refer to `funding` to understand funding fee, and `cashFlow` to understand 8-hour P&L.
+		Fee string `json:"fee"` // Trading fee Positive fee value means expense Negative fee value means rebates
+		CashFlow string `json:"cashFlow"` // Cash flow, e.g., (1) close the position, and unRPL converts to RPL, (2) 8-hour session settlement for USDC Perp and Futures, (3) transfer in or transfer out. This does not include trading fee, funding fee
+		Change string `json:"change"` // Change = cashFlow + funding - fee
+		CashBalance string `json:"cashBalance"` // Cash balance. This is the wallet balance after a cash change
+		FeeRate string `json:"feeRate"` // When type=`TRADE`, then it is trading fee rate When type=`SETTLEMENT`, it means funding fee rate. For side=Buy, feeRate=market fee rate; For side=Sell, feeRate= - market fee rate
+		BonusChange string `json:"bonusChange"` // The change of bonus
+		TradeId string `json:"tradeId"` // Trade ID
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+		ExtraFees string `json:"extraFees"` // Trading fee rate information. Currently, this data is returned only for spot orders placed on the Indonesian site or spot fiat currency orders placed on the EU site. In other cases, an empty string is returned. Enum: [feeType](../enum#extrafeesfeetype), [subFeeType](../enum#extrafeessubfeetype)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/account/wallet-balance
@@ -106,7 +200,44 @@ type GetAccountWalletBalanceRequest struct {
 }
 
 type GetAccountWalletBalanceResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		AccountType string `json:"accountType"` // Account type
+		AccountLTV string `json:"accountLTV"` // deprecated field
+		AccountIMRate string `json:"accountIMRate"` // Account IM rate You can refer to this [Glossary](https://www.bybit.com/en/help-center/article/Glossary-Unified-Trading-Account) to understand the below fields calculation and mearning All account wide fields are <b>not</b> applicable to [UTA2.0](../acct-mode#uta-20)(isolated margin), [UTA1.0](../acct-mode#uta-10)(isolated margin), [UTA1.0](../acct-mode#uta-10)(CONTRACT), classic account(SPOT, CONTRACT)
+		AccountIMRateByMp string `json:"accountIMRateByMp"` // Account IM rate calculated by mark price
+		AccountMMRate string `json:"accountMMRate"` // Account MM rate
+		AccountMMRateByMp string `json:"accountMMRateByMp"` // Account MM rate calculated by mark price
+		TotalEquity string `json:"totalEquity"` // Account total equity (USD)
+		TotalWalletBalance string `json:"totalWalletBalance"` // Account wallet balance (USD): ∑Asset Wallet Balance By USD value of each asset
+		TotalMarginBalance string `json:"totalMarginBalance"` // Account margin balance (USD): totalWalletBalance + totalPerpUPL
+		TotalAvailableBalance string `json:"totalAvailableBalance"` // Account available balance (USD), Cross Margin: totalMarginBalance - totalInitialMargin
+		TotalPerpUPL string `json:"totalPerpUPL"` // Account Perps and Futures unrealised p&l (USD): ∑Each Perp and USDC Futures upl by base coin
+		TotalInitialMargin string `json:"totalInitialMargin"` // Account initial margin (USD): ∑Asset Total Initial Margin Base Coin
+		TotalInitialMarginByMp string `json:"totalInitialMarginByMp"` // Account initial margin (USD) calculated by mark price: ∑Asset Total Initial Margin Base Coin calculated by mark price
+		TotalMaintenanceMargin string `json:"totalMaintenanceMargin"` // Account maintenance margin (USD): ∑ Asset Total Maintenance Margin Base Coin
+		TotalMaintenanceMarginByMp string `json:"totalMaintenanceMarginByMp"` // Account maintenance margin (USD) calculated by mark price: ∑ Asset Total Maintenance Margin Base Coin calculated by mark price
+		Coin []struct {
+			Coin string `json:"coin"` // Coin name, such as BTC, ETH, USDT, USDC
+			Equity string `json:"equity"` // Equity of coin
+			UsdValue string `json:"usdValue"` // USD value of coin
+			WalletBalance string `json:"walletBalance"` // Wallet balance of coin
+			Free string `json:"free"` // Available balance for Spot wallet. _This is a unique field for Classic `SPOT`_
+			Locked string `json:"locked"` // Locked balance due to the Spot open order
+			SpotHedgingQty string `json:"spotHedgingQty"` // The spot asset qty that is used to hedge in the portfolio margin, truncate to 8 decimals and "0" by default
+			BorrowAmount string `json:"borrowAmount"` // Borrow amount of current coin
+			AvailableToWithdraw string `json:"availableToWithdraw"` // **Note:** this field is deprecated for `accountType=UNIFIED` from 9 Jan, 2025 Transferable balance: you can use [Get Transferable Amount (Unified)](unified-trans-amnt#) or [Get All Coins Balance](../asset/balance/all-balance#) instead Derivatives available balance: <b>isolated margin</b>: walletBalance - totalPositionIM - totalOrderIM - locked - bonus <b>cross & portfolio margin</b>: look at field `totalAvailableBalance`(USD), which needs to be converted into the available balance of accordingly coin through index price Spot (margin) available balance: refer to [Get Borrow Quota (Spot)](../order/spot-borrow-quota#)
+			AccruedInterest string `json:"accruedInterest"` // Accrued interest
+			TotalOrderIM string `json:"totalOrderIM"` // Pre-occupied margin for order. For portfolio margin mode, it returns ""
+			TotalPositionIM string `json:"totalPositionIM"` // Sum of initial margin of all positions + Pre-occupied liquidation fee. For portfolio margin mode, it returns ""
+			TotalPositionMM string `json:"totalPositionMM"` // Sum of maintenance margin for all positions. For portfolio margin mode, it returns ""
+			UnrealisedPnl string `json:"unrealisedPnl"` // Unrealised P&L
+			CumRealisedPnl string `json:"cumRealisedPnl"` // Cumulative Realised P&L
+			Bonus string `json:"bonus"` // Bonus. _This is a unique field for accounType=UNIFIED_
+			MarginCollateral bool `json:"marginCollateral"` // Whether it can be used as a margin collateral currency (platform), `true`: YES, `false`: NO When marginCollateral=false, then collateralSwitch is meaningless
+			CollateralSwitch bool `json:"collateralSwitch"` // Whether the collateral is turned on by user (user), `true`: ON, `false`: OFF When marginCollateral=true, then collateralSwitch is meaningful
+			AvailableToBorrow string `json:"availableToBorrow"` // deprecated field, always return `""`. Please refer to `availableToBorrow` in the [Get Collateral Info](collateral-info)
+		} `json:"coin"`
+	} `json:"list"`
 }
 
 // GET /v5/account/withdrawal
@@ -115,7 +246,8 @@ type GetAccountWithdrawalRequest struct {
 }
 
 type GetAccountWithdrawalResponse struct {
-	// TODO: fill in response fields parsed from docs
+	AvailableWithdrawal string `json:"availableWithdrawal"` // Transferable amount for the 1st coin in the request
+	AvailableWithdrawalMap string `json:"availableWithdrawalMap"`
 }
 
 // GET /v5/asset/coin-greeks
@@ -124,7 +256,13 @@ type GetAssetCoinGreeksRequest struct {
 }
 
 type GetAssetCoinGreeksResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		BaseCoin string `json:"baseCoin"` // Base coin. e.g.,`BTC`,`ETH`,`SOL`
+		TotalDelta string `json:"totalDelta"` // Delta value
+		TotalGamma string `json:"totalGamma"` // Gamma value
+		TotalVega string `json:"totalVega"` // Vega value
+		TotalTheta string `json:"totalTheta"` // Theta value
+	} `json:"list"`
 }
 
 // POST /v5/account/mmp-modify
@@ -155,7 +293,10 @@ type PostAccountQuickRepaymentRequest struct {
 }
 
 type PostAccountQuickRepaymentResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		Coin string `json:"coin"` // Coin used for repayment The order of currencies used to repay liability is based on `liquidationOrder` from [this endpoint](../spot-margin-uta/vip-margin)
+		RepaymentQty string `json:"repaymentQty"` // Repayment qty
+	} `json:"list"`
 }
 
 // POST /v5/account/set-collateral-switch
@@ -174,7 +315,12 @@ type PostAccountSetCollateralSwitchBatchRequest struct {
 }
 
 type PostAccountSetCollateralSwitchBatchResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Result struct {
+		List []struct {
+			Coin string `json:"coin"` // Coin name
+			CollateralSwitch string `json:"collateralSwitch"` // `ON`: switch on collateral, `OFF`: switch off collateral
+		} `json:"list"`
+	} `json:"result"`
 }
 
 // POST /v5/account/set-hedging-mode
@@ -183,7 +329,8 @@ type PostAccountSetHedgingModeRequest struct {
 }
 
 type PostAccountSetHedgingModeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	RetCode int64 `json:"retCode"` // Result code
+	RetMsg string `json:"retMsg"` // Result message
 }
 
 // POST /v5/account/set-limit-px-action
@@ -202,7 +349,10 @@ type PostAccountSetMarginModeRequest struct {
 }
 
 type PostAccountSetMarginModeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Reasons []struct {
+		ReasonCode string `json:"reasonCode"` // Fail reason code
+		ReasonMsg string `json:"reasonMsg"` // Fail reason msg
+	} `json:"reasons"`
 }
 
 // POST /v5/account/upgrade-to-uta
@@ -210,6 +360,9 @@ type PostAccountUpgradeToUtaRequest struct {
 }
 
 type PostAccountUpgradeToUtaResponse struct {
-	// TODO: fill in response fields parsed from docs
+	UnifiedUpdateStatus string `json:"unifiedUpdateStatus"` // Upgrade status. `FAIL`,`PROCESS`,`SUCCESS`
+	UnifiedUpdateMsg struct {
+		Msg []string `json:"msg"` // Error message array. Only `FAIL` will have this field
+	} `json:"unifiedUpdateMsg"`
 }
 

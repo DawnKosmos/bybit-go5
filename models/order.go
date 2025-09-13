@@ -16,7 +16,40 @@ type GetExecutionListRequest struct {
 }
 
 type GetExecutionListResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customized order ID. _Classic `spot` is not supported_
+		Side string `json:"side"` // Side. `Buy`,`Sell`
+		OrderPrice string `json:"orderPrice"` // Order price
+		OrderQty string `json:"orderQty"` // Order qty
+		LeavesQty string `json:"leavesQty"` // The remaining qty not executed. _Classic `spot` is not supported_
+		CreateType string `json:"createType"` // Order create type classic account & [UTA1.0](../acct-mode#uta-10)(category=inverse): always `""` Spot, Option do not have this key
+		OrderType string `json:"orderType"` // Order type. `Market`,`Limit`
+		StopOrderType string `json:"stopOrderType"` // Stop order type. If the order is not stop order, it either returns `UNKNOWN` or `""`. _Classic `spot` is not supported_
+		ExecFee string `json:"execFee"` // Executed trading fee. You can get spot fee currency instruction [here](../enum#spot-fee-currency-instruction)
+		ExecFeeV2 string `json:"execFeeV2"` // Spot leg transaction fee, only works for execType=`FutureSpread`
+		ExecId string `json:"execId"` // Execution ID
+		ExecPrice string `json:"execPrice"` // Execution price
+		ExecQty string `json:"execQty"` // Execution qty
+		ExecType string `json:"execType"` // Executed type. _Classic `spot` is not supported_
+		ExecValue string `json:"execValue"` // Executed order value. _Classic `spot` is not supported_
+		ExecTime string `json:"execTime"` // Executed timestamp (ms)
+		FeeCurrency string `json:"feeCurrency"` // Spot trading fee currency _Classic `spot` is not supported_
+		IsMaker bool `json:"isMaker"` // Is maker order. `true`: maker, `false`: taker
+		FeeRate string `json:"feeRate"` // Trading fee rate. _Classic `spot` is not supported_
+		TradeIv string `json:"tradeIv"` // Implied volatility. Valid for `option`
+		MarkIv string `json:"markIv"` // Implied volatility of mark price. Valid for `option`
+		MarkPrice string `json:"markPrice"` // The mark price of the symbol when executing. _Classic `spot` is not supported_
+		IndexPrice string `json:"indexPrice"` // The index price of the symbol when executing. _Valid for `option` only_
+		UnderlyingPrice string `json:"underlyingPrice"` // The underlying price of the symbol when executing. _Valid for `option`_
+		BlockTradeId string `json:"blockTradeId"` // Paradigm block trade ID
+		ClosedSize string `json:"closedSize"` // Closed position size
+		Seq int64 `json:"seq"` // Cross sequence, used to associate each fill and each position update The seq will be the same when conclude multiple transactions at the same time Different symbols may have the same seq, please use seq + symbol to check unique classic account Spot trade does not have this field
+		ExtraFees string `json:"extraFees"` // Trading fee rate information. Currently, this data is returned only for kyc=Indian user or spot orders placed on the Indonesian site or spot fiat currency orders placed on the EU site. In other cases, an empty string is returned. Enum: [feeType](../enum#extrafeesfeetype), [subFeeType](../enum#extrafeessubfeetype)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/order/history
@@ -36,7 +69,58 @@ type GetOrderHistoryRequest struct {
 }
 
 type GetOrderHistoryResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	List []struct {
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+		BlockTradeId string `json:"blockTradeId"` // Block trade ID
+		Symbol string `json:"symbol"` // Symbol name
+		Price string `json:"price"` // Order price
+		Qty string `json:"qty"` // Order qty
+		Side string `json:"side"` // Side. `Buy`,`Sell`
+		IsLeverage string `json:"isLeverage"` // Whether to borrow. **Unified `spot`** only. `0`: false, `1`: true. . _Classic `spot` is not supported, always `0`_
+		PositionIdx int64 `json:"positionIdx"` // Position index. Used to identify positions in different position modes
+		OrderStatus string `json:"orderStatus"` // Order status
+		CreateType string `json:"createType"` // Order create type Only for category=linear or inverse Spot, Option do not have this key
+		CancelType string `json:"cancelType"` // Cancel type
+		RejectReason string `json:"rejectReason"` // Reject reason. _Classic `spot` is not supported_
+		AvgPrice string `json:"avgPrice"` // Average filled price UTA: returns `""` for those orders without avg price classic account: returns `"0"` for those orders without avg price, and also for those orders have partilly filled but cancelled at the end
+		LeavesQty string `json:"leavesQty"` // The remaining qty not executed. _Classic `spot` is not supported_
+		LeavesValue string `json:"leavesValue"` // The estimated value not executed. _Classic `spot` is not supported_
+		CumExecQty string `json:"cumExecQty"` // Cumulative executed order qty
+		CumExecValue string `json:"cumExecValue"` // Cumulative executed order value. _Classic `spot` is not supported_
+		CumExecFee string `json:"cumExecFee"` // Cumulative executed trading fee. _Classic `spot` is not supported_
+		TimeInForce string `json:"timeInForce"` // Time in force
+		OrderType string `json:"orderType"` // Order type. `Market`,`Limit`. For TP/SL order, it means the order type after triggered `Block trade Roll Back`, `Block trade-Limit`: Unique enum values for Unified account block trades
+		StopOrderType string `json:"stopOrderType"` // Stop order type
+		OrderIv string `json:"orderIv"` // Implied volatility
+		MarketUnit string `json:"marketUnit"` // The unit for `qty` when create **Spot market** orders for **UTA account**. `baseCoin`, `quoteCoin`
+		SlippageToleranceType string `json:"slippageToleranceType"` // Spot and Futures market order slippage tolerance type `TickSize`, `Percent`, `UNKNOWN`(default)
+		SlippageTolerance string `json:"slippageTolerance"` // Slippage tolerance value
+		TriggerPrice string `json:"triggerPrice"` // Trigger price. If `stopOrderType`=_TrailingStop_, it is activate price. Otherwise, it is trigger price
+		TakeProfit string `json:"takeProfit"` // Take profit price
+		StopLoss string `json:"stopLoss"` // Stop loss price
+		TpslMode string `json:"tpslMode"` // TP/SL mode, `Full`: entire position for TP/SL. `Partial`: partial position tp/sl. Spot does not have this field, and Option returns always ""
+		OcoTriggerBy string `json:"ocoTriggerBy"` // The trigger type of Spot OCO order.`OcoTriggerByUnknown`, `OcoTriggerByTp`, `OcoTriggerBySl`. _Classic `spot` is not supported_
+		TpLimitPrice string `json:"tpLimitPrice"` // The limit order price when take profit price is triggered
+		SlLimitPrice string `json:"slLimitPrice"` // The limit order price when stop loss price is triggered
+		TpTriggerBy string `json:"tpTriggerBy"` // The price type to trigger take profit
+		SlTriggerBy string `json:"slTriggerBy"` // The price type to trigger stop loss
+		TriggerDirection int64 `json:"triggerDirection"` // Trigger direction. `1`: rise, `2`: fall
+		TriggerBy string `json:"triggerBy"` // The price type of trigger price
+		LastPriceOnCreated string `json:"lastPriceOnCreated"` // Last price when place the order, Spot is not applicable
+		BasePrice string `json:"basePrice"` // Last price when place the order, Spot has this field only
+		ReduceOnly bool `json:"reduceOnly"` // Reduce only. `true` means reduce position size
+		CloseOnTrigger bool `json:"closeOnTrigger"` // Close on trigger. <a href="https://www.bybit.com/en/help-center/article/Close-On-Trigger-Order">What is a close on trigger order?</a>
+		PlaceType string `json:"placeType"` // Place type, `option` used. `iv`, `price`
+		SmpType string `json:"smpType"` // SMP execution type
+		SmpGroup int64 `json:"smpGroup"` // Smp group ID. If the UID has no group, it is `0` by default
+		SmpOrderId string `json:"smpOrderId"` // The counterparty's orderID which triggers this SMP execution
+		CreatedTime string `json:"createdTime"` // Order created timestamp (ms)
+		UpdatedTime string `json:"updatedTime"` // Order updated timestamp (ms)
+		ExtraFees string `json:"extraFees"` // Trading fee rate information. Currently, this data is returned only for spot orders placed on the Indonesian site or spot fiat currency orders placed on the EU site. In other cases, an empty string is returned. Enum: [feeType](../enum#extrafeesfeetype), [subFeeType](../enum#extrafeessubfeetype)
+	} `json:"list"`
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
 }
 
 // GET /v5/order/realtime
@@ -54,7 +138,55 @@ type GetOrderRealtimeRequest struct {
 }
 
 type GetOrderRealtimeResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"` // Product type
+	NextPageCursor string `json:"nextPageCursor"` // Refer to the `cursor` request parameter
+	List []struct {
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+		BlockTradeId string `json:"blockTradeId"` // Paradigm block trade ID
+		Symbol string `json:"symbol"` // Symbol name
+		Price string `json:"price"` // Order price
+		Qty string `json:"qty"` // Order qty
+		Side string `json:"side"` // Side. `Buy`,`Sell`
+		IsLeverage string `json:"isLeverage"` // Whether to borrow. **Unified `spot`** only. `0`: false, `1`: true. _Classic `spot` is not supported, always `0`_
+		PositionIdx int64 `json:"positionIdx"` // Position index. Used to identify positions in different position modes.
+		OrderStatus string `json:"orderStatus"` // Order status
+		CreateType string `json:"createType"` // Order create type Only for category=linear or inverse Spot, Option do not have this key
+		CancelType string `json:"cancelType"` // Cancel type
+		RejectReason string `json:"rejectReason"` // Reject reason. _Classic `spot` is not supported_
+		AvgPrice string `json:"avgPrice"` // Average filled price UTA: returns `""` for those orders without avg price classic account: returns `"0"` for those orders without avg price, and also for those orders have partilly filled but cancelled at the end
+		LeavesQty string `json:"leavesQty"` // The remaining qty not executed. _Classic `spot` is not supported_
+		LeavesValue string `json:"leavesValue"` // The estimated value not executed. _Classic `spot` is not supported_
+		CumExecQty string `json:"cumExecQty"` // Cumulative executed order qty
+		CumExecValue string `json:"cumExecValue"` // Cumulative executed order value. _Classic `spot` is not supported_
+		CumExecFee string `json:"cumExecFee"` // Cumulative executed trading fee. _Classic `spot` is not supported_
+		TimeInForce string `json:"timeInForce"` // Time in force
+		OrderType string `json:"orderType"` // Order type. `Market`,`Limit`. For TP/SL order, it means the order type after triggered
+		StopOrderType string `json:"stopOrderType"` // Stop order type
+		OrderIv string `json:"orderIv"` // Implied volatility
+		MarketUnit string `json:"marketUnit"` // The unit for `qty` when create **Spot market** orders for **UTA account**. `baseCoin`, `quoteCoin`
+		TriggerPrice string `json:"triggerPrice"` // Trigger price. If `stopOrderType`=_TrailingStop_, it is activate price. Otherwise, it is trigger price
+		TakeProfit string `json:"takeProfit"` // Take profit price
+		StopLoss string `json:"stopLoss"` // Stop loss price
+		TpslMode string `json:"tpslMode"` // TP/SL mode, `Full`: entire position for TP/SL. `Partial`: partial position tp/sl. Spot does not have this field, and Option returns always ""
+		OcoTriggerBy string `json:"ocoTriggerBy"` // The trigger type of Spot OCO order.`OcoTriggerByUnknown`, `OcoTriggerByTp`, `OcoTriggerByBySl`. _Classic `spot` is not supported_
+		TpLimitPrice string `json:"tpLimitPrice"` // The limit order price when take profit price is triggered
+		SlLimitPrice string `json:"slLimitPrice"` // The limit order price when stop loss price is triggered
+		TpTriggerBy string `json:"tpTriggerBy"` // The price type to trigger take profit
+		SlTriggerBy string `json:"slTriggerBy"` // The price type to trigger stop loss
+		TriggerDirection int64 `json:"triggerDirection"` // Trigger direction. `1`: rise, `2`: fall
+		TriggerBy string `json:"triggerBy"` // The price type of trigger price
+		LastPriceOnCreated string `json:"lastPriceOnCreated"` // Last price when place the order, Spot is not applicable
+		BasePrice string `json:"basePrice"` // Last price when place the order, Spot has this field only
+		ReduceOnly bool `json:"reduceOnly"` // Reduce only. `true` means reduce position size
+		CloseOnTrigger bool `json:"closeOnTrigger"` // Close on trigger. <a href="https://www.bybit.com/en/help-center/article/Close-On-Trigger-Order">What is a close on trigger order?</a>
+		PlaceType string `json:"placeType"` // Place type, `option` used. `iv`, `price`
+		SmpType string `json:"smpType"` // SMP execution type
+		SmpGroup int64 `json:"smpGroup"` // Smp group ID. If the UID has no group, it is `0` by default
+		SmpOrderId string `json:"smpOrderId"` // The counterparty's orderID which triggers this SMP execution
+		CreatedTime string `json:"createdTime"` // Order created timestamp (ms)
+		UpdatedTime string `json:"updatedTime"` // Order updated timestamp (ms)
+	} `json:"list"`
 }
 
 // GET /v5/order/spot-borrow-check
@@ -65,7 +197,13 @@ type GetOrderSpotBorrowCheckRequest struct {
 }
 
 type GetOrderSpotBorrowCheckResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Symbol string `json:"symbol"` // Symbol name, like `BTCUSDT`, uppercase only
+	Side string `json:"side"` // Side
+	MaxTradeQty string `json:"maxTradeQty"` // The maximum base coin qty can be traded If spot margin trade on and symbol is margin trading pair, it returns available balance + max.borrowable quantity = min(The maximum quantity that a single user can borrow on the platform, The maximum quantity that can be borrowed calculated by IMR MMR of UTA account, The available quantity of the platform's capital pool) Otherwise, it returns actual available balance up to 4 decimals
+	MaxTradeAmount string `json:"maxTradeAmount"` // The maximum quote coin amount can be traded If spot margin trade on and symbol is margin trading pair, it returns available balance + max.borrowable amount = min(The maximum amount that a single user can borrow on the platform, The maximum amount that can be borrowed calculated by IMR MMR of UTA account, The available amount of the platform's capital pool) Otherwise, it returns actual available balance up to 8 decimals
+	SpotMaxTradeQty string `json:"spotMaxTradeQty"` // No matter your Spot margin switch on or not, it always returns actual qty of base coin you can trade or you have (borrowable qty is not included), up to 4 decimals
+	SpotMaxTradeAmount string `json:"spotMaxTradeAmount"` // No matter your Spot margin switch on or not, it always returns actual amount of quote coin you can trade or you have (borrowable amount is not included), up to 8 decimals
+	BorrowCoin string `json:"borrowCoin"` // Borrow coin
 }
 
 // POST /v5/order/amend
@@ -89,7 +227,8 @@ type PostOrderAmendRequest struct {
 }
 
 type PostOrderAmendResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Order ID
+	OrderLinkId string `json:"orderLinkId"` // User customised order ID
 }
 
 // POST /v5/order/amend-batch
@@ -99,7 +238,20 @@ type PostOrderAmendBatchRequest struct {
 }
 
 type PostOrderAmendBatchResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Result struct {
+		List []struct {
+			Category string `json:"category"` // Product type
+			Symbol string `json:"symbol"` // Symbol name
+			OrderId string `json:"orderId"` // Order ID
+			OrderLinkId string `json:"orderLinkId"` // User customised order ID
+		} `json:"list"`
+	} `json:"result"`
+	RetExtInfo struct {
+		List []struct {
+			Code string `json:"code"` // Success/error code
+			Msg string `json:"msg"` // Success/error message
+		} `json:"list"`
+	} `json:"retExtInfo"`
 }
 
 // POST /v5/order/cancel
@@ -112,7 +264,8 @@ type PostOrderCancelRequest struct {
 }
 
 type PostOrderCancelResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Order ID
+	OrderLinkId string `json:"orderLinkId"` // User customised order ID
 }
 
 // POST /v5/order/cancel-all
@@ -126,7 +279,11 @@ type PostOrderCancelAllRequest struct {
 }
 
 type PostOrderCancelAllResponse struct {
-	// TODO: fill in response fields parsed from docs
+	List []struct {
+		OrderId string `json:"orderId"` // Order ID
+		OrderLinkId string `json:"orderLinkId"` // User customised order ID
+	} `json:"list"`
+	Success string `json:"success"` // "1": success, "0": fail [UTA1.0](../acct-mode#uta-10)(inverse), classic(linear, inverse) do not return this field
 }
 
 // POST /v5/order/cancel-batch
@@ -136,7 +293,20 @@ type PostOrderCancelBatchRequest struct {
 }
 
 type PostOrderCancelBatchResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Result struct {
+		List []struct {
+			Category string `json:"category"` // Product type
+			Symbol string `json:"symbol"` // Symbol name
+			OrderId string `json:"orderId"` // Order ID
+			OrderLinkId string `json:"orderLinkId"` // User customised order ID
+		} `json:"list"`
+	} `json:"result"`
+	RetExtInfo struct {
+		List []struct {
+			Code string `json:"code"` // Success/error code
+			Msg string `json:"msg"` // Success/error message
+		} `json:"list"`
+	} `json:"retExtInfo"`
 }
 
 // POST /v5/order/create
@@ -175,7 +345,8 @@ type PostOrderCreateRequest struct {
 }
 
 type PostOrderCreateResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Order ID
+	OrderLinkId string `json:"orderLinkId"` // User customised order ID
 }
 
 // POST /v5/order/create-batch
@@ -185,7 +356,21 @@ type PostOrderCreateBatchRequest struct {
 }
 
 type PostOrderCreateBatchResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Result struct {
+		List []struct {
+			Category string `json:"category"` // Product type
+			Symbol string `json:"symbol"` // Symbol name
+			OrderId string `json:"orderId"` // Order ID
+			OrderLinkId string `json:"orderLinkId"` // User customised order ID
+			CreateAt string `json:"createAt"` // Order created time (ms)
+		} `json:"list"`
+	} `json:"result"`
+	RetExtInfo struct {
+		List []struct {
+			Code string `json:"code"` // Success/error code
+			Msg string `json:"msg"` // Success/error message
+		} `json:"list"`
+	} `json:"retExtInfo"`
 }
 
 // POST /v5/order/disconnected-cancel-all
@@ -203,6 +388,11 @@ type PostOrderPreCheckRequest struct {
 }
 
 type PostOrderPreCheckResponse struct {
-	// TODO: fill in response fields parsed from docs
+	OrderId string `json:"orderId"` // Order ID
+	OrderLinkId string `json:"orderLinkId"` // User customised order ID
+	PreImrE4 int64 `json:"preImrE4"` // Initial margin rate before checking, keep four decimal places. For examples, 30 means IMR = 30/1e4 = 0.30%
+	PreMmrE4 int64 `json:"preMmrE4"` // Maintenance margin rate before checking, keep four decimal places. For examples, 30 means MMR = 30/1e4 = 0.30%
+	PostImrE4 int64 `json:"postImrE4"` // Initial margin rate calculated after checking, keep four decimal places. For examples, 30 means IMR = 30/1e4 = 0.30%
+	PostMmrE4 int64 `json:"postMmrE4"` // Maintenance margin rate calculated after checking, keep four decimal places. For examples, 30 means MMR = 30/1e4 = 0.30%
 }
 
