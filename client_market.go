@@ -40,7 +40,31 @@ func (c *Client) GetMarketIndexPriceKline(req models.GetMarketIndexPriceKlineReq
 	return &respBody.Result, nil
 }
 
-// GET /v5/market/instruments-info
+// GET /v5/market/instruments-info for category: linear
+func (c *Client) GetMarketInstrumentsInfoLinear(req models.GetMarketInstrumentsInfoRequest) (*models.GetMarketInstrumentsInfoLinearResponse, error) {
+	req.Category = "linear"
+	var respBody models.Response[models.GetMarketInstrumentsInfoLinearResponse]
+	if err := c.GET("/v5/market/instruments-info", req, &respBody); err != nil { return nil, err }
+	return &respBody.Result, nil
+}
+
+// GET /v5/market/instruments-info for category: option
+func (c *Client) GetMarketInstrumentsInfoOption(req models.GetMarketInstrumentsInfoRequest) (*models.GetMarketInstrumentsInfoOptionResponse, error) {
+	req.Category = "option"
+	var respBody models.Response[models.GetMarketInstrumentsInfoOptionResponse]
+	if err := c.GET("/v5/market/instruments-info", req, &respBody); err != nil { return nil, err }
+	return &respBody.Result, nil
+}
+
+// GET /v5/market/instruments-info for category: spot
+func (c *Client) GetMarketInstrumentsInfoSpot(req models.GetMarketInstrumentsInfoRequest) (*models.GetMarketInstrumentsInfoSpotResponse, error) {
+	req.Category = "spot"
+	var respBody models.Response[models.GetMarketInstrumentsInfoSpotResponse]
+	if err := c.GET("/v5/market/instruments-info", req, &respBody); err != nil { return nil, err }
+	return &respBody.Result, nil
+}
+
+// GET /v5/market/instruments-info (generic - use category-specific methods for type safety)
 func (c *Client) GetMarketInstrumentsInfo(req models.GetMarketInstrumentsInfoRequest) (*models.GetMarketInstrumentsInfoResponse, error) {
 	var respBody models.Response[models.GetMarketInstrumentsInfoResponse]
 	if err := c.GET("/v5/market/instruments-info", req, &respBody); err != nil { return nil, err }
@@ -110,7 +134,31 @@ func (c *Client) GetMarketRiskLimit(req models.GetMarketRiskLimitRequest) (*mode
 	return &respBody.Result, nil
 }
 
-// GET /v5/market/tickers
+// GET /v5/market/tickers for category: linear
+func (c *Client) GetMarketTickersLinear(req models.GetMarketTickersRequest) (*models.GetMarketTickersLinearResponse, error) {
+	req.Category = "linear"
+	var respBody models.Response[models.GetMarketTickersLinearResponse]
+	if err := c.GET("/v5/market/tickers", req, &respBody); err != nil { return nil, err }
+	return &respBody.Result, nil
+}
+
+// GET /v5/market/tickers for category: option
+func (c *Client) GetMarketTickersOption(req models.GetMarketTickersRequest) (*models.GetMarketTickersOptionResponse, error) {
+	req.Category = "option"
+	var respBody models.Response[models.GetMarketTickersOptionResponse]
+	if err := c.GET("/v5/market/tickers", req, &respBody); err != nil { return nil, err }
+	return &respBody.Result, nil
+}
+
+// GET /v5/market/tickers for category: spot
+func (c *Client) GetMarketTickersSpot(req models.GetMarketTickersRequest) (*models.GetMarketTickersSpotResponse, error) {
+	req.Category = "spot"
+	var respBody models.Response[models.GetMarketTickersSpotResponse]
+	if err := c.GET("/v5/market/tickers", req, &respBody); err != nil { return nil, err }
+	return &respBody.Result, nil
+}
+
+// GET /v5/market/tickers (generic - use category-specific methods for type safety)
 func (c *Client) GetMarketTickers(req models.GetMarketTickersRequest) (*models.GetMarketTickersResponse, error) {
 	var respBody models.Response[models.GetMarketTickersResponse]
 	if err := c.GET("/v5/market/tickers", req, &respBody); err != nil { return nil, err }

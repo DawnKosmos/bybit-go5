@@ -105,8 +105,123 @@ type GetMarketInstrumentsInfoRequest struct {
 	Cursor string `url:"cursor,omitempty"` // Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set
 }
 
+// GetMarketInstrumentsInfo response for category: spot
+type GetMarketInstrumentsInfoSpotResponse struct {
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		BaseCoin string `json:"baseCoin"` // Base coin
+		QuoteCoin string `json:"quoteCoin"` // Quote coin
+		Innovation string `json:"innovation"` // Whether or not this is an <a href="https://blog.bybit.com/en-us/post/bybit-innovation-zone-blt055db8d22a445fa6/">innovation zone token</a>. <code>0</code>: false, <code>1</code>: true
+		Status string `json:"status"` // Instrument status
+		MarginTrading string `json:"marginTrading"` // Margin trade symbol or not This is to identify if the symbol support margin trading under different account modes You may find some symbols not supporting margin buy or margin sell, so you need to go to <a href="/v5/account/collateral-info">Collateral Info (UTA)</a> to check if that coin is borrowable
+		StTag string `json:"stTag"` // Whether or not it has an <a href="https://www.bybit.com/en/help-center/article/Bybit-Special-Treatment-ST-Label-Management-Rules">special treatment label</a>. <code>0</code>: false, <code>1</code>: true
+		LotSizeFilter struct {
+			BasePrecision string `json:"basePrecision"` // The precision of base coin
+			QuotePrecision string `json:"quotePrecision"` // The precision of quote coin
+			MinOrderQty string `json:"minOrderQty"` // Minimum order quantity
+			MaxOrderQty string `json:"maxOrderQty"` // Maximum order quantity
+			MinOrderAmt string `json:"minOrderAmt"` // Minimum order amount
+			MaxOrderAmt string `json:"maxOrderAmt"` // Maximum order amount
+		} `json:"lotSizeFilter"`
+		PriceFilter struct {
+			TickSize string `json:"tickSize"` // The step to increase/reduce order price
+		} `json:"priceFilter"`
+		RiskParameters struct {
+			PriceLimitRatioX string `json:"priceLimitRatioX"` // Ratio X
+			PriceLimitRatioY string `json:"priceLimitRatioY"` // Ratio Y
+		} `json:"riskParameters"`
+	} `json:"list"`
+}
+
+// GetMarketInstrumentsInfo response for category: linear
+type GetMarketInstrumentsInfoLinearResponse struct {
+	Category string `json:"category"` // Product type
+	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used to pagination
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		ContractType string `json:"contractType"` // Contract type
+		Status string `json:"status"` // Instrument status
+		BaseCoin string `json:"baseCoin"` // Base coin
+		QuoteCoin string `json:"quoteCoin"` // Quote coin
+		LaunchTime string `json:"launchTime"` // Launch timestamp (ms)
+		DeliveryTime string `json:"deliveryTime"` // Delivery timestamp (ms) Expired futures delivery time Perpetual delisting time
+		DeliveryFeeRate string `json:"deliveryFeeRate"` // Delivery fee rate
+		PriceScale string `json:"priceScale"` // Price scale
+		LeverageFilter struct {
+			MinLeverage string `json:"minLeverage"` // Minimum leverage
+			MaxLeverage string `json:"maxLeverage"` // Maximum leverage
+			LeverageStep string `json:"leverageStep"` // The step to increase/reduce leverage
+		} `json:"leverageFilter"`
+		PriceFilter struct {
+			MinPrice string `json:"minPrice"` // Minimum order price
+			MaxPrice string `json:"maxPrice"` // Maximum order price
+			TickSize string `json:"tickSize"` // The step to increase/reduce order price
+		} `json:"priceFilter"`
+		LotSizeFilter struct {
+			MinNotionalValue string `json:"minNotionalValue"` // Minimum notional value
+			MaxOrderQty string `json:"maxOrderQty"` // Maximum quantity for Limit and PostOnly order
+			MaxMktOrderQty string `json:"maxMktOrderQty"` // Maximum quantity for Market order
+			MinOrderQty string `json:"minOrderQty"` // Minimum order quantity
+			QtyStep string `json:"qtyStep"` // The step to increase/reduce order quantity
+			PostOnlyMaxOrderQty string `json:"postOnlyMaxOrderQty"` // deprecated, please use <code>maxOrderQty</code>
+		} `json:"lotSizeFilter"`
+		UnifiedMarginTrade bool `json:"unifiedMarginTrade"` // Whether to support unified margin trade
+		FundingInterval int64 `json:"fundingInterval"` // Funding interval (minute)
+		SettleCoin string `json:"settleCoin"` // Settle coin
+		CopyTrading string `json:"copyTrading"` // Copy trade symbol or not
+		UpperFundingRate string `json:"upperFundingRate"` // Upper limit of funding date
+		LowerFundingRate string `json:"lowerFundingRate"` // Lower limit of funding date
+		DisplayName string `json:"displayName"` // The USDC futures & perpetual name displayed in the Web or App
+		RiskParameters struct {
+			PriceLimitRatioX string `json:"priceLimitRatioX"` // Ratio X
+			PriceLimitRatioY string `json:"priceLimitRatioY"` // Ratio Y
+		} `json:"riskParameters"`
+		IsPreListing bool `json:"isPreListing"` // Whether the contract is a pre-market contract When the pre-market contract is converted to official contract, it will be false
+		PreListingInfo struct {
+			CurAuctionPhase string `json:"curAuctionPhase"` // The current auction phase
+			Phases string `json:"phases"` // Each phase time info
+			AuctionFeeInfo struct {
+				AuctionFeeRate string `json:"auctionFeeRate"` // The trading fee rate during auction phase There is no trading fee until entering continues trading phase
+				TakerFeeRate string `json:"takerFeeRate"` // The taker fee rate during continues trading phase
+				MakerFeeRate string `json:"makerFeeRate"` // The maker fee rate during continues trading phase
+			} `json:"auctionFeeInfo"`
+		} `json:"preListingInfo"`
+	} `json:"list"`
+}
+
+// GetMarketInstrumentsInfo response for category: option
+type GetMarketInstrumentsInfoOptionResponse struct {
+	Category string `json:"category"` // Product type
+	NextPageCursor string `json:"nextPageCursor"` // Cursor. Used to pagination
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		OptionsType string `json:"optionsType"` // Option type. <code>Call</code>, <code>Put</code>
+		Status string `json:"status"` // Instrument status
+		BaseCoin string `json:"baseCoin"` // Base coin
+		QuoteCoin string `json:"quoteCoin"` // Quote coin
+		SettleCoin string `json:"settleCoin"` // Settle coin
+		LaunchTime string `json:"launchTime"` // Launch timestamp (ms)
+		DeliveryTime string `json:"deliveryTime"` // Delivery timestamp (ms)
+		DeliveryFeeRate string `json:"deliveryFeeRate"` // Delivery fee rate
+		PriceFilter struct {
+			MinPrice string `json:"minPrice"` // Minimum order price
+			MaxPrice string `json:"maxPrice"` // Maximum order price
+			TickSize string `json:"tickSize"` // The step to increase/reduce order price
+		} `json:"priceFilter"`
+		LotSizeFilter struct {
+			MaxOrderQty string `json:"maxOrderQty"` // Maximum order quantity
+			MinOrderQty string `json:"minOrderQty"` // Minimum order quantity
+			QtyStep string `json:"qtyStep"` // The step to increase/reduce order quantity
+		} `json:"lotSizeFilter"`
+		DisplayName string `json:"displayName"` // The option name displayed in the Web or App
+	} `json:"list"`
+}
+
+// GetMarketInstrumentsInfo generic response (use category-specific types for type safety)
 type GetMarketInstrumentsInfoResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"`
+	List []map[string]interface{} `json:"list"`
 }
 
 // GET /v5/market/insurance
@@ -287,8 +402,96 @@ type GetMarketTickersRequest struct {
 	ExpDate string `url:"expDate,omitempty"` // Expiry date. e.g., 25DEC22. Apply to `option` **only**
 }
 
+// GetMarketTickers response for category: option
+type GetMarketTickersOptionResponse struct {
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		Bid1Price string `json:"bid1Price"` // Best bid price
+		Bid1Size string `json:"bid1Size"` // Best bid size
+		Bid1Iv string `json:"bid1Iv"` // Best bid iv
+		Ask1Price string `json:"ask1Price"` // Best ask price
+		Ask1Size string `json:"ask1Size"` // Best ask size
+		Ask1Iv string `json:"ask1Iv"` // Best ask iv
+		LastPrice string `json:"lastPrice"` // Last price
+		HighPrice24h string `json:"highPrice24h"` // The highest price in the last 24 hours
+		LowPrice24h string `json:"lowPrice24h"` // The lowest price in the last 24 hours
+		MarkPrice string `json:"markPrice"` // Mark price
+		IndexPrice string `json:"indexPrice"` // Index price
+		MarkIv string `json:"markIv"` // Mark price iv
+		UnderlyingPrice string `json:"underlyingPrice"` // Underlying price
+		OpenInterest string `json:"openInterest"` // Open interest size
+		Turnover24h string `json:"turnover24h"` // Turnover for 24h
+		Volume24h string `json:"volume24h"` // Volume for 24h
+		TotalVolume string `json:"totalVolume"` // Total volume
+		TotalTurnover string `json:"totalTurnover"` // Total turnover
+		Delta string `json:"delta"` // Delta
+		Gamma string `json:"gamma"` // Gamma
+		Vega string `json:"vega"` // Vega
+		Theta string `json:"theta"` // Theta
+		PredictedDeliveryPrice string `json:"predictedDeliveryPrice"` // Predicated delivery price. It has a value 30 mins before delivery
+		Change24h string `json:"change24h"` // The change in the last 24 hous
+	} `json:"list"`
+}
+
+// GetMarketTickers response for category: spot
+type GetMarketTickersSpotResponse struct {
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		Bid1Price string `json:"bid1Price"` // Best bid price
+		Bid1Size string `json:"bid1Size"` // Best bid size
+		Ask1Price string `json:"ask1Price"` // Best ask price
+		Ask1Size string `json:"ask1Size"` // Best ask size
+		LastPrice string `json:"lastPrice"` // Last price
+		PrevPrice24h string `json:"prevPrice24h"` // Market price 24 hours ago
+		Price24hPcnt string `json:"price24hPcnt"` // Percentage change of market price relative to 24h
+		HighPrice24h string `json:"highPrice24h"` // The highest price in the last 24 hours
+		LowPrice24h string `json:"lowPrice24h"` // The lowest price in the last 24 hours
+		Turnover24h string `json:"turnover24h"` // Turnover for 24h
+		Volume24h string `json:"volume24h"` // Volume for 24h
+		UsdIndexPrice string `json:"usdIndexPrice"` // USD index price used to calculate USD value of the assets in Unified account non-collateral margin coin returns "" Only those trading pairs like "XXX/USDT" or "XXX/USDC" have the value
+	} `json:"list"`
+}
+
+// GetMarketTickers response for category: linear
+type GetMarketTickersLinearResponse struct {
+	Category string `json:"category"` // Product type
+	List []struct {
+		Symbol string `json:"symbol"` // Symbol name
+		LastPrice string `json:"lastPrice"` // Last price
+		IndexPrice string `json:"indexPrice"` // Index price
+		MarkPrice string `json:"markPrice"` // Mark price
+		PrevPrice24h string `json:"prevPrice24h"` // Market price 24 hours ago
+		Price24hPcnt string `json:"price24hPcnt"` // Percentage change of market price relative to 24h
+		HighPrice24h string `json:"highPrice24h"` // The highest price in the last 24 hours
+		LowPrice24h string `json:"lowPrice24h"` // The lowest price in the last 24 hours
+		PrevPrice1h string `json:"prevPrice1h"` // Market price an hour ago
+		OpenInterest string `json:"openInterest"` // Open interest size
+		OpenInterestValue string `json:"openInterestValue"` // Open interest value
+		Turnover24h string `json:"turnover24h"` // Turnover for 24h
+		Volume24h string `json:"volume24h"` // Volume for 24h
+		FundingRate string `json:"fundingRate"` // Funding rate
+		NextFundingTime string `json:"nextFundingTime"` // Next funding time (ms)
+		PredictedDeliveryPrice string `json:"predictedDeliveryPrice"` // Predicated delivery price. It has a value 30 mins before delivery
+		BasisRate string `json:"basisRate"` // Basis rate
+		Basis string `json:"basis"` // Basis
+		DeliveryFeeRate string `json:"deliveryFeeRate"` // Delivery fee rate
+		DeliveryTime string `json:"deliveryTime"` // Delivery timestamp (ms), applicable to expiry futures only
+		Ask1Size string `json:"ask1Size"` // Best ask size
+		Bid1Price string `json:"bid1Price"` // Best bid price
+		Ask1Price string `json:"ask1Price"` // Best ask price
+		Bid1Size string `json:"bid1Size"` // Best bid size
+		PreOpenPrice string `json:"preOpenPrice"` // Estimated pre-market contract open price Meaningless once the market opens
+		PreQty string `json:"preQty"` // Estimated pre-market contract open qty The value is meaningless once the market opens
+		CurPreListingPhase string `json:"curPreListingPhase"` // The current pre-market contract phase
+	} `json:"list"`
+}
+
+// GetMarketTickers generic response (use category-specific types for type safety)
 type GetMarketTickersResponse struct {
-	// TODO: fill in response fields parsed from docs
+	Category string `json:"category"`
+	List []map[string]interface{} `json:"list"`
 }
 
 // GET /v5/market/time

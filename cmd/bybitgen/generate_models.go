@@ -85,6 +85,56 @@ func writeModelsFile(modelsDir, folder string, eps []Endpoint) error {
 			}
 		}
 	}
+	
+	// writeCategoryNested writes nested fields for category-specific responses
+	var writeCategoryNested func(b *strings.Builder, catResp CategoryResponse, nestedKey string, params []Param, indent string)
+	writeCategoryNested = func(b *strings.Builder, catResp CategoryResponse, nestedKey string, params []Param, indent string) {
+		for _, np := range params {
+			nf := toExportedResp(np.Name)
+			t := strings.ToLower(strings.TrimSpace(np.Type))
+			switch t {
+			case "array":
+				inner := catResp.RespNested[nestedKey+"."+np.Name]
+				if len(inner) == 0 {
+					if np.Comment != "" {
+						b.WriteString(fmt.Sprintf("%s%s []string `json:\"%s\"` // %s\n", indent, nf, np.Name, cleanComment(np.Comment)))
+					} else {
+						b.WriteString(fmt.Sprintf("%s%s []string `json:\"%s\"`\n", indent, nf, np.Name))
+					}
+				} else {
+					if isIndexedList(inner) {
+						// Array-of-arrays case
+						b.WriteString(fmt.Sprintf("%s%s [][]string `json:\"%s\"`\n", indent, nf, np.Name))
+					} else {
+						b.WriteString(fmt.Sprintf("%s%s []struct {\n", indent, nf))
+						writeCategoryNested(b, catResp, nestedKey+"."+np.Name, inner, indent+"\t")
+						b.WriteString(fmt.Sprintf("%s} `json:\"%s\"`\n", indent, np.Name))
+					}
+				}
+			case "object":
+				inner := catResp.RespNested[nestedKey+"."+np.Name]
+				if len(inner) == 0 {
+					if np.Comment != "" {
+						b.WriteString(fmt.Sprintf("%s%s string `json:\"%s\"` // %s\n", indent, nf, np.Name, cleanComment(np.Comment)))
+					} else {
+						b.WriteString(fmt.Sprintf("%s%s string `json:\"%s\"`\n", indent, nf, np.Name))
+					}
+				} else {
+					b.WriteString(fmt.Sprintf("%s%s struct {\n", indent, nf))
+					writeCategoryNested(b, catResp, nestedKey+"."+np.Name, inner, indent+"\t")
+					b.WriteString(fmt.Sprintf("%s} `json:\"%s\"`\n", indent, np.Name))
+				}
+			default:
+				gt := respMapType(np.Type)
+				if np.Comment != "" {
+					b.WriteString(fmt.Sprintf("%s%s %s `json:\"%s\"` // %s\n", indent, nf, gt, np.Name, cleanComment(np.Comment)))
+				} else {
+					b.WriteString(fmt.Sprintf("%s%s %s `json:\"%s\"`\n", indent, nf, gt, np.Name))
+				}
+			}
+		}
+	}
+	
 	for _, ep := range eps {
 		b.WriteString(fmt.Sprintf("// %s %s\n", ep.Method, ep.Path))
 		b.WriteString(fmt.Sprintf("type %sRequest struct {\n", ep.Name))
@@ -108,51 +158,116 @@ func writeModelsFile(modelsDir, folder string, eps []Endpoint) error {
 			}
 		}
 		b.WriteString("}\n\n")
-		// Response
-		if len(ep.RespTop) == 0 {
-			b.WriteString(fmt.Sprintf("type %sResponse struct {\n\t// TODO: fill in response fields parsed from docs\n}\n\n", ep.Name))
-		} else {
-			b.WriteString(fmt.Sprintf("type %sResponse struct {\n", ep.Name))
-			for _, rp := range ep.RespTop {
-				field := toExported(rp.Name)
-				// Determine Go type for response field
-				lowerType := strings.ToLower(strings.TrimSpace(rp.Type))
-				switch lowerType {
-				case "array":
-					nested := ep.RespNested[rp.Name]
-					if len(nested) == 0 {
-						// default to []string when item schema unknown
-						b.WriteString(fmt.Sprintf("\t%s []string `json:\"%s\"`\n", field, rp.Name))
-					} else {
-						if isIndexedList(nested) {
-							b.WriteString(fmt.Sprintf("\t%s [][]string `json:\"%s\"`\n", field, rp.Name))
+		
+		// Generate category-specific response types if this endpoint has category-dependent responses
+		if ep.HasCategoryParam && len(ep.CategoryResponses) > 0 {
+			// Generate category-specific response structs
+			for category, catResp := range ep.CategoryResponses {
+				categoryName := strings.Title(category)
+				if category == "linear" {
+					categoryName = "Linear"
+				} else if category == "inverse" {
+					categoryName = "Inverse"
+				}
+				
+				b.WriteString(fmt.Sprintf("// %s response for category: %s\n", ep.Name, category))
+				b.WriteString(fmt.Sprintf("type %s%sResponse struct {\n", ep.Name, categoryName))
+				
+				for _, rp := range catResp.RespTop {
+					field := toExported(rp.Name)
+					// Determine Go type for response field
+					lowerType := strings.ToLower(strings.TrimSpace(rp.Type))
+					switch lowerType {
+					case "array":
+						nested := catResp.RespNested[rp.Name]
+						if len(nested) == 0 {
+							// default to []string when item schema unknown
+							b.WriteString(fmt.Sprintf("\t%s []string `json:\"%s\"`\n", field, rp.Name))
 						} else {
-							b.WriteString(fmt.Sprintf("\t%s []struct {\n", field))
-							// write nested fields, supporting deeper levels using key rp.Name
+							if isIndexedList(nested) {
+								b.WriteString(fmt.Sprintf("\t%s [][]string `json:\"%s\"`\n", field, rp.Name))
+							} else {
+								b.WriteString(fmt.Sprintf("\t%s []struct {\n", field))
+								// write nested fields for category-specific response
+								writeCategoryNested(&b, catResp, rp.Name, nested, "\t\t")
+								b.WriteString(fmt.Sprintf("\t} `json:\"%s\"`\n", rp.Name))
+							}
+						}
+					case "object":
+						nested := catResp.RespNested[rp.Name]
+						if len(nested) == 0 {
+							// unknown object -> string fallback
+							b.WriteString(fmt.Sprintf("\t%s string `json:\"%s\"`\n", field, rp.Name))
+						} else {
+							b.WriteString(fmt.Sprintf("\t%s struct {\n", field))
+							writeCategoryNested(&b, catResp, rp.Name, nested, "\t\t")
+							b.WriteString(fmt.Sprintf("\t} `json:\"%s\"`\n", rp.Name))
+						}
+					default:
+						gt := respMapType(rp.Type)
+						if rp.Comment != "" {
+							b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s\"` // %s\n", field, gt, rp.Name, cleanComment(rp.Comment)))
+						} else {
+							b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s\"`\n", field, gt, rp.Name))
+						}
+					}
+				}
+				b.WriteString("}\n\n")
+			}
+			
+			// Generate a generic response struct that can hold any category
+			b.WriteString(fmt.Sprintf("// %s generic response (use category-specific types for type safety)\n", ep.Name))
+			b.WriteString(fmt.Sprintf("type %sResponse struct {\n", ep.Name))
+			b.WriteString("\tCategory string `json:\"category\"`\n")
+			b.WriteString("\tList []map[string]interface{} `json:\"list\"`\n")
+			b.WriteString("}\n\n")
+		} else {
+			// Standard response generation (not category-dependent)
+			if len(ep.RespTop) == 0 {
+				b.WriteString(fmt.Sprintf("type %sResponse struct {\n\t// TODO: fill in response fields parsed from docs\n}\n\n", ep.Name))
+			} else {
+				b.WriteString(fmt.Sprintf("type %sResponse struct {\n", ep.Name))
+				for _, rp := range ep.RespTop {
+					field := toExported(rp.Name)
+					// Determine Go type for response field
+					lowerType := strings.ToLower(strings.TrimSpace(rp.Type))
+					switch lowerType {
+					case "array":
+						nested := ep.RespNested[rp.Name]
+						if len(nested) == 0 {
+							// default to []string when item schema unknown
+							b.WriteString(fmt.Sprintf("\t%s []string `json:\"%s\"`\n", field, rp.Name))
+						} else {
+							if isIndexedList(nested) {
+								b.WriteString(fmt.Sprintf("\t%s [][]string `json:\"%s\"`\n", field, rp.Name))
+							} else {
+								b.WriteString(fmt.Sprintf("\t%s []struct {\n", field))
+								// write nested fields, supporting deeper levels using key rp.Name
+								writeNested(&b, ep, rp.Name, nested, "\t\t")
+								b.WriteString(fmt.Sprintf("\t} `json:\"%s\"`\n", rp.Name))
+							}
+						}
+					case "object":
+						nested := ep.RespNested[rp.Name]
+						if len(nested) == 0 {
+							// unknown object -> string fallback
+							b.WriteString(fmt.Sprintf("\t%s string `json:\"%s\"`\n", field, rp.Name))
+						} else {
+							b.WriteString(fmt.Sprintf("\t%s struct {\n", field))
 							writeNested(&b, ep, rp.Name, nested, "\t\t")
 							b.WriteString(fmt.Sprintf("\t} `json:\"%s\"`\n", rp.Name))
 						}
-					}
-				case "object":
-					nested := ep.RespNested[rp.Name]
-					if len(nested) == 0 {
-						// unknown object -> string fallback
-						b.WriteString(fmt.Sprintf("\t%s string `json:\"%s\"`\n", field, rp.Name))
-					} else {
-						b.WriteString(fmt.Sprintf("\t%s struct {\n", field))
-						writeNested(&b, ep, rp.Name, nested, "\t\t")
-						b.WriteString(fmt.Sprintf("\t} `json:\"%s\"`\n", rp.Name))
-					}
-				default:
-					gt := respMapType(rp.Type)
-					if rp.Comment != "" {
-						b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s\"` // %s\n", field, gt, rp.Name, cleanComment(rp.Comment)))
-					} else {
-						b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s\"`\n", field, gt, rp.Name))
+					default:
+						gt := respMapType(rp.Type)
+						if rp.Comment != "" {
+							b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s\"` // %s\n", field, gt, rp.Name, cleanComment(rp.Comment)))
+						} else {
+							b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s\"`\n", field, gt, rp.Name))
+						}
 					}
 				}
+				b.WriteString("}\n\n")
 			}
-			b.WriteString("}\n\n")
 		}
 	}
 	file := filepath.Join(modelsDir, fmt.Sprintf("%s.go", folder))

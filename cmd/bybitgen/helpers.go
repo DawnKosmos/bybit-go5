@@ -57,11 +57,55 @@ func parseTableRow(line string) []string {
 	return parts
 }
 
-// stripFormatting removes simple Markdown formatting like links [text](url) and backticks.
+// parseHTMLTableRow splits an HTML table row "<td>a</td><td>b</td><td>c</td>" into cells.
+func parseHTMLTableRow(line string) []string {
+	var cells []string
+	// Simple HTML table cell extraction
+	parts := strings.Split(line, "<td>")
+	for i := 1; i < len(parts); i++ { // skip first empty part
+		if endIdx := strings.Index(parts[i], "</td>"); endIdx >= 0 {
+			cell := strings.TrimSpace(parts[i][:endIdx])
+			cells = append(cells, cell)
+		}
+	}
+	return cells
+}
+
+// stripFormatting removes simple Markdown formatting like links [text](url) and backticks, and HTML anchor tags.
 func stripFormatting(s string) string {
 	// remove backticks
 	s = strings.ReplaceAll(s, "`", "")
-	// remove links: [text](...)
+	
+	// remove HTML anchor tags: <a href="...">text</a>
+	for {
+		start := strings.Index(s, "<a ")
+		if start == -1 {
+			start = strings.Index(s, "<a\t")
+			if start == -1 {
+				break
+			}
+		}
+		// Find the end of the opening tag
+		tagEnd := strings.Index(s[start:], ">")
+		if tagEnd == -1 {
+			break
+		}
+		tagEnd += start + 1
+		
+		// Find the closing tag
+		closeStart := strings.Index(s[tagEnd:], "</a>")
+		if closeStart == -1 {
+			break
+		}
+		closeStart += tagEnd
+		closeEnd := closeStart + 4
+		
+		// Extract the text content between the tags
+		content := s[tagEnd:closeStart]
+		s = s[:start] + content + s[closeEnd:]
+	}
+	
+	// remove markdown links: [text](...)
 	for {
 		start := strings.Index(s, "[")
 		mid := strings.Index(s, "](")
